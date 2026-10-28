@@ -1,6 +1,6 @@
 # Resonance
 
-An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS and Windows installation tools. Current source revision: **4.9**.
+An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current source revision: **4.10**.
 
 [![Cross-platform checks](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml/badge.svg)](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml)
 
@@ -20,6 +20,16 @@ An album-focused listening interface inside Spotify desktop, built with Spicetif
 - Reduced-motion support, fullscreen controls, local preference storage and optional diagnostics.
 - Update, uninstall and installation-health commands with recovery backups.
 
+## Install on Fedora / Linux
+
+See [the Fedora setup guide](LINUX.md) for Flatpak and native Spotify. After Spotify and Spicetify are configured, open a terminal in this folder and run:
+
+```sh
+sh resonance.sh update
+```
+
+Use `sh resonance.sh check` after a Spotify update, and `sh resonance.sh uninstall` to remove Resonance.
+
 ## Install on macOS
 
 1. Install and sign in to Spotify desktop.
@@ -30,7 +40,7 @@ An album-focused listening interface inside Spotify desktop, built with Spicetif
 ./resonance.command update
 ```
 
-The updater rebuilds the bundle, registers the extension and applies it. Spotify restarts. Open **Resonance** near the top of Spotify. Click the **resonance** name inside the view for grouped Look & layout, Visualizer, Lyrics and Advanced settings. Escape dismisses settings first, then returns to Spotify. Escape returns to Spotify.
+The updater rebuilds the bundle, registers the extension and applies it. Spotify restarts. Open **Resonance** near the top of Spotify. Click the **resonance** name inside the view for grouped Look & layout, Visualizer, Lyrics and Advanced settings. Escape dismisses settings first, then returns to Spotify.
 
 The updater is local: it installs the source in this folder, without downloading a newer release. After pulling a repository update, run it again. Double-clickable Update, Check and Uninstall command files are also included.
 

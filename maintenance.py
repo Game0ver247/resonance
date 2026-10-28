@@ -65,10 +65,44 @@ def windows_file_version(path):
     return '.'.join(str(value) for value in (ms >> 16, ms & 0xffff, ls >> 16, ls & 0xffff))
 
 
+def linux_spotify_version(resources):
+    """Query the configured installation, entering Flatpak's runtime when needed."""
+    def query(args):
+        result = subprocess.run(args, check=True, capture_output=True, text=True,
+                                encoding='utf-8', errors='replace', timeout=10)
+        return result.stdout.strip()
+
+    try:
+        if 'com.spotify.Client' in resources.parts:
+            # Resolve active symlinks and compare deployments: never inspect a
+            # different user/system installation just because it is available.
+            for scope in ('--user', '--system'):
+                try:
+                    location = Path(query(['flatpak', 'info', scope, '--show-location', 'com.spotify.Client']))
+                    if not location.is_absolute():
+                        continue
+                    expected = location / 'files' / 'extra' / 'share' / 'spotify'
+                    if expected.resolve() == resources.resolve():
+                        output = query(['flatpak', 'run', scope, 'com.spotify.Client', '--version'])
+                        break
+                except (OSError, subprocess.SubprocessError):
+                    continue
+            else:
+                return ''
+        else:
+            output = query([str(resources / 'spotify'), '--version'])
+        match = re.search(r'(?i)Spotify(?: version)?\s+(\d+\.\d+\.\d+\.\d+)', output)
+        return match.group(1) if match else ''
+    except (OSError, subprocess.SubprocessError):
+        return ''
+
+
 def spotify_version(resources):
     executable = resources / 'Spotify.exe'
     if executable.is_file():
         return windows_file_version(executable)
+    if (resources / 'spotify').is_file():
+        return linux_spotify_version(resources)
     try:
         with (resources.parent / 'Info.plist').open('rb') as stream:
             return plistlib.load(stream).get('CFBundleShortVersionString', '')

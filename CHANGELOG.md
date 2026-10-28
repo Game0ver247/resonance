@@ -1,3 +1,10 @@
+# 4.10.0 — Fedora / Linux
+
+- Linux entry points for install/update, health checks, uninstall and bundle building.
+- Native Spotify version detection and deployment-matched Flatpak runtime queries.
+- Fedora setup guide and automated checks on Fedora, Ubuntu, Windows and macOS.
+- Existing listening interface and preferences remain unchanged.
+
 # Changes
 
 ## 4.9.0
