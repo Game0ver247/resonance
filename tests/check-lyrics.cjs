@@ -1,0 +1,11 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const context={};vm.runInNewContext(fs.readFileSync('Spotify-Customization/lyrics-engine.js','utf8'),context);const engine=context.ResonanceLyrics;
+let rows=engine.lrc('[00:01.00]<00:01.00>One <00:01.70>two\n[00:03.00]\n[00:04.00]Longer line here',8000);
+assert.equal(rows[0].exact,true);assert.equal(rows[2].exact,false);
+assert.equal(engine.active(rows,900).line,-1);assert.equal(engine.active(rows,1750).word,1);assert.equal(engine.active(rows,1500).word,0);assert.equal(engine.active(rows,3200).word,-1);
+assert.equal(engine.active(rows,8100).line,-1);
+rows=engine.spotify({lyrics:{syncType:'SYLLABLE_SYNCED',lines:[{startTimeMs:'1000',endTimeMs:'3000',words:'Hello world',syllables:[{startTimeMs:'1000',numChars:3},{startTimeMs:'1200',numChars:3},{startTimeMs:'2000',numChars:5}]}]}},4000);
+assert.equal(rows[0].words.length,2);assert.equal(rows[0].words[0].start,1000);assert.equal(rows[0].words[1].start,2000);assert.equal(engine.active(rows,2100).word,1);
+assert.equal(engine.spotify({lyrics:{syncType:'UNSYNCED',lines:[]}},2000).length,0);
+rows=engine.finalize([{start:1000,text:'Synthetic test line'},{start:20000,text:'Other line'}],30000);assert.equal(engine.active(rows,15000).line,-1);
+console.log('Passed: enhanced-LRC words, real syllable-to-word grouping, estimated line-only timing, seek boundaries, instrumental gaps, unsupported lyrics');

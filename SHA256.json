@@ -1,0 +1,21 @@
+{
+  "Install v1.command": "1f3761da837d6b8cc27854239c008d764b7fd5c4ad16fd8fe974dfc88be6c434",
+  "README.md": "816289e252571634d7edb72b00561d489bc2e6a868e752e504b807005aea2a39",
+  "Resonance/README.md": "f345e348a1137b93a0ede641e3014466eb5656d9667518be2c1a77a0a62969b7",
+  "Resonance/Source/Info.plist": "27e743210707868585cd4181159c59319340972e9554fb1b9a21839ba5095bda",
+  "Resonance/Source/Lyrics.swift": "d6855367d05af14d44484cf63b76807c5fd4eff3a7edec210ff679be1e53106b",
+  "Resonance/Source/Resonance.swift": "f8f8e0809e6df2831feeba76a6007ed491f327fd6ab5dacc6b9deff096c95935",
+  "Resonance/build.command": "bc771aa2fb0b80a24986649799c0c00bb1e8c612b5dfe7d44c8a27dfb2cf62ac",
+  "Spotify-Customization/AudioBridge/Source/AudioBridge.swift": "8d8c8fe0bcf4246c1ebef8fa3ed06ad3aec4b6dde2ec99c9c00d130c28435e12",
+  "Spotify-Customization/AudioBridge/Source/Info.plist": "36abbb7e8722d58bc7b06c2d65837203d7f83d63919f1738aed381e58b0343b4",
+  "Spotify-Customization/AudioBridge/build.command": "8b4b5828675f604488bdd7ec115fc18d59873399093ae8e092ca1f4fe3e8a896",
+  "Spotify-Customization/README.md": "abe97f908b4873ded66941d7041d729949bcecfcaa78660845cd8b6580020967",
+  "Spotify-Customization/Reapply Customization.command": "57c976c4cceea959c7090ded13bfd34df4fc7ac3488106aaa7a3c10e6c6fcb3a",
+  "Spotify-Customization/Restore Spotify.command": "4ca98bfeb589f40ed7778f59c84dfac5e8e2afd5b5fecfb623ebc9b709e4c18f",
+  "Spotify-Customization/build-extension.command": "d653f9c2eae8b3513beff3a9f03421a38c7e9d5a3950e573fc1d5dd0fd53d862",
+  "Spotify-Customization/display-ui.js": "b06aab452111c305a5e9597ebd57080a1347a9845b8918e0eb2b5a6556c6d669",
+  "Spotify-Customization/lyrics-engine.js": "7eaf457f2bc29623923cb536c19ff52f91276d87c190102eef15af7d8b122eb7",
+  "Spotify-Customization/resonanceDisplay.js": "175d883bad4ea54a502e152ae73f8a95667b6a6fdd5bae6ce7a9a98be289ce4b",
+  "tests/check-extension.cjs": "07f1dffe400b87680712f770a38ce4a764626a46d38d8f47fed26bbb6f2cf4ee",
+  "tests/check-lyrics.cjs": "5e32862da4f64dbe649926ca6824c4e92971dc04495d7ae31b8dccf9b9ac686a"
+}

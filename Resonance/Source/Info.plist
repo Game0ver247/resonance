@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleExecutable</key><string>Resonance</string>
+<key>CFBundleIdentifier</key><string>local.resonance.mac</string>
+<key>CFBundleName</key><string>Resonance</string>
+<key>CFBundleDisplayName</key><string>Resonance</string>
+<key>CFBundleVersion</key><string>1</string>
+<key>CFBundleShortVersionString</key><string>1.0</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>LSMinimumSystemVersion</key><string>14.0</string>
+<key>NSAppleEventsUsageDescription</key><string>Resonance reads track details and controls playback in Spotify on your Mac.</string>
+<key>NSScreenCaptureUsageDescription</key><string>Resonance analyzes system audio locally for its visualizer. It does not save or transmit audio or screen frames.</string>
+<key>NSHighResolutionCapable</key><true/>
+</dict></plist>
