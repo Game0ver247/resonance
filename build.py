@@ -3,8 +3,12 @@
 from pathlib import Path
 
 
+def build_bundle(root):
+    return (root / 'lyrics-engine.js').read_bytes() + b'\n' + (root / 'display-ui.js').read_bytes()
+
+
 def build(root):
-    bundle = (root / 'lyrics-engine.js').read_bytes() + b'\n' + (root / 'display-ui.js').read_bytes()
+    bundle = build_bundle(root)
     (root / 'resonanceDisplay.js').write_bytes(bundle)
     return bundle
 

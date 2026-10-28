@@ -12,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+from build import build_bundle
 
 EXTENSION = 'resonanceDisplay.js'
 
@@ -101,7 +102,8 @@ class Resonance:
         self.backup_version = self.config.get('Backup', 'version', fallback='')
         self.index = (self.xpui / 'index.html').read_text(encoding='utf-8', errors='replace') if (self.xpui / 'index.html').is_file() else ''
         try:
-            self.state = json.loads(self.state_path.read_text(encoding='utf-8'))
+            state = json.loads(self.state_path.read_text(encoding='utf-8'))
+            self.state = state if isinstance(state,dict) else {}
         except (OSError, ValueError):
             self.state = {}
 
@@ -143,7 +145,7 @@ class Resonance:
         }
 
     def source_bundle(self):
-        return (self.project / 'lyrics-engine.js').read_bytes() + b'\n' + (self.project / 'display-ui.js').read_bytes()
+        return build_bundle(self.project)
 
     def command(self, *args, dry_run=False):
         self.commands.append(list(args))

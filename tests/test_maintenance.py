@@ -7,6 +7,10 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import sys
+import os
+import shutil
+
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 
 spec=importlib.util.spec_from_file_location('maintenance',Path(__file__).resolve().parents[1]/'maintenance.py')
 module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
@@ -79,6 +83,13 @@ class MaintenanceTests(unittest.TestCase):
         self.manager.runner=fail
         with self.assertRaises(subprocess.CalledProcessError):self.manager.update()
         self.assertFalse(self.manager.state_path.exists())
+    def test_non_object_state_is_treated_as_missing_metadata(self):
+        self.manager.state_path.parent.mkdir(parents=True,exist_ok=True)
+        for payload in ['[]','null','false','42','"old"']:
+            with self.subTest(payload=payload):
+                self.manager.state_path.write_text(payload,encoding='utf-8')
+                self.assertEqual(self.manager.check()['status'],'healthy')
+
     def test_applied_corruption(self):
         self.manager.applied.write_text('broken')
         self.assertTrue(any('different extension' in x for x in self.manager.check()['issues']))
@@ -106,6 +117,20 @@ class WindowsMaintenanceTests(MaintenanceTests):
             with self.assertRaisesRegex(RuntimeError,'version is unreadable'):
                 self.manager.update()
         self.assertEqual(self.manager.commands,[])
+
+
+class RestoreWrapperTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('zsh'),'zsh wrapper test requires zsh')
+    def test_restore_uses_the_cli_on_path(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);binary=root/'spicetify';record=root/'called'
+            binary.write_text('#!/bin/sh\nprintf "%s" "$1" > "$RESONANCE_TEST_RECORD"\n',encoding='utf-8');binary.chmod(0o755)
+            wrapper=Path(__file__).resolve().parents[1]/'Restore Spotify.command'
+            # Block the old absolute command so this test can never alter real Spotify.
+            script='function /opt/homebrew/bin/spicetify { return 127 }; source "$1"'
+            result=subprocess.run([shutil.which('zsh'),'-c',script,'test',str(wrapper)],env={**os.environ,'PATH':str(root),'RESONANCE_TEST_RECORD':str(record)},capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual(record.read_text(),'restore')
 
 
 class NativeWindowsVersionTests(unittest.TestCase):

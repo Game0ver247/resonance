@@ -1,6 +1,6 @@
 // NAME: Resonance Display
 // AUTHOR: Local customization
-// VERSION: 4.8
+// VERSION: 4.9
 // DESCRIPTION: Album-focused Spotify listening view with synced lyrics, track-analysis visuals and playback controls.
 (() => {
   if (document.getElementById('resonance-launch')) return;
@@ -242,12 +242,39 @@
   #resonance-root :is(.resonance-translation,#resonance-lyric-note,#resonance-expanded-note,#resonance-expand-lyrics) {color:rgba(var(--lyric-ink-rgb,244,245,241),.75)}
   #resonance-root[data-lyric-contrast="dark"] #resonance-lyric-line {text-shadow:0 1px 2px #ffffff20}
   `;
+  css.textContent+=`
+  #resonance-themes {width:316px;max-width:calc(100vw - 40px);padding:16px 18px;scrollbar-width:thin;scrollbar-color:#ffffff30 transparent}
+  .resonance-menu-heading {font-size:15px;font-weight:600;letter-spacing:-.02em;margin:0 0 10px;color:#f4f5ef}
+  .resonance-setting-group {border-top:1px solid #ffffff12}
+  .resonance-setting-group summary {list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:13px 0;color:#ffffffbb;font-size:12px;font-weight:550}
+  .resonance-setting-group summary::-webkit-details-marker {display:none}
+  .resonance-setting-group summary::after {content:'+';font-size:16px;color:#ffffff65;font-weight:400}
+  .resonance-setting-group[open] summary::after {content:'−'}
+  .resonance-group-content {padding:0 0 17px}
+  #resonance-root .resonance-group-content .resonance-setting-label,#resonance-root #resonance-visual-label {margin:15px 0 8px;font-size:10px;line-height:1.5;color:#ffffff80}
+  #resonance-root .resonance-group-content>:first-child {margin-top:0}
+  #resonance-root .resonance-setting-options button,#resonance-root #resonance-visual-options button {min-height:32px;padding:6px 11px;line-height:1.35}
+  #resonance-root button:focus-visible,.resonance-setting-group summary:focus-visible {outline:2px solid var(--accent);outline-offset:3px}
+  #resonance-swatches {gap:12px;flex-wrap:wrap}
+  #resonance-artwork {width:min(100%,var(--art-max-size,46vh));justify-self:center}
+  #resonance-root[data-layout="center"] #resonance-artwork {width:min(30vh,32vw,var(--art-max-size,30vh))}
+  #resonance-info,#resonance-summary-title {color:var(--lyric-ink,#f4f5ef)}
+  #resonance-artist {color:rgba(var(--lyric-ink-rgb,244,245,241),.8)}
+  #resonance-album,#resonance-summary-artist,#resonance-summary-album {color:rgba(var(--lyric-ink-rgb,244,245,241),.65)}
+  #resonance-header-right {max-width:100%}
+  #resonance-actions {flex-wrap:wrap;justify-content:flex-end}
+  #resonance-source {color:rgba(var(--lyric-ink-rgb,244,245,241),.65)}
+  #resonance-root #resonance-actions button {color:var(--lyric-ink,#f4f5ef);border-color:rgba(var(--lyric-ink-rgb,244,245,241),.28)}
+  @media(max-width:860px) {#resonance-header{gap:12px}#resonance-header-right{flex:1;min-width:0}#resonance-source{max-width:100%}}
+  @media(max-width:620px) {#resonance-header{flex-wrap:wrap;padding-top:36px}#resonance-header-right{flex-basis:100%;gap:8px}#resonance-actions{gap:6px}#resonance-actions button{font-size:11px;padding:7px 10px}#resonance-content{width:90vw;gap:20px;grid-template-columns:min(34vw,36vh) minmax(0,1fr)}#resonance-title{font-size:24px;margin-bottom:12px}#resonance-artist{font-size:16px}#resonance-kicker{margin-bottom:12px;font-size:9px;letter-spacing:2px}}
+  @media(max-height:720px) {#resonance-root[data-layout="center"]:not([data-art-no-lyrics="true"]) #resonance-lyrics{height:90px}#resonance-root[data-layout="center"] #resonance-lyric-line{min-height:44px}#resonance-root #resonance-artwork{width:min(40vh,100%,var(--art-max-size,40vh))}#resonance-root[data-layout="center"] #resonance-artwork{width:min(24vh,32vw,var(--art-max-size,24vh))}#resonance-kicker{margin-bottom:12px}#resonance-title{margin-bottom:12px}#resonance-artist{margin-bottom:8px}#resonance-info{max-height:100%}#resonance-player{gap:12px;padding-bottom:12px}}
+`;
   document.head.append(css);
   const launch = document.createElement('button');
   launch.id = 'resonance-launch'; launch.textContent = 'Resonance'; launch.title = 'Open artwork-focused listening view';
   const root = document.createElement('section'); root.id = 'resonance-root'; root.hidden = true;
   root.setAttribute('aria-label','Resonance listening view');
-  root.innerHTML = `<div id="resonance-bg"></div><div id="resonance-aurora" aria-hidden="true"><div id="resonance-palette-a" class="resonance-palette-layer"></div><div id="resonance-palette-b" class="resonance-palette-layer"></div></div><div id="resonance-accent-bg" aria-hidden="true"></div><div id="resonance-beat-glow" aria-hidden="true"></div><div id="resonance-debug" aria-hidden="true"></div><div id="resonance-grain" aria-hidden="true"></div><header id="resonance-header"><div id="resonance-brand-wrap"><button id="resonance-brand" aria-label="Resonance appearance" aria-expanded="false" aria-controls="resonance-themes" title="Colors and visualizer">resonance</button><div id="resonance-themes" hidden><div id="resonance-theme-label">Accent color</div><div id="resonance-swatches"></div><div id="resonance-visual-label">Visualizer</div><div id="resonance-visual-options"></div><div class="resonance-setting-label">Motion</div><div id="resonance-motion-options" class="resonance-setting-options"></div><div id="resonance-analysis-info" style="font-size:10px;line-height:1.5;color:#ffffff70;margin-top:10px">Checking analysis availability</div><div class="resonance-setting-label">Background</div><div id="resonance-background-options" class="resonance-setting-options"></div><div class="resonance-setting-label">Layout</div><div id="resonance-layout-options" class="resonance-setting-options"></div><div class="resonance-setting-label">Beat pulse</div><div id="resonance-beat-ui-options" class="resonance-setting-options"></div><div class="resonance-setting-label">Artwork</div><div id="resonance-artwork-options" class="resonance-setting-options"></div><div class="resonance-setting-label">Lyrics</div><div id="resonance-lyric-style-options" class="resonance-setting-options"></div><div class="resonance-setting-label">Lyric timing (this song)</div><div id="resonance-sync-options" class="resonance-setting-options"><span id="resonance-sync-value">0.0s</span></div><div id="resonance-sync-hint">[ shows lyrics earlier · ] later · \\ resets</div><div class="resonance-setting-label">Debug overlay (D)</div><div id="resonance-debug-options" class="resonance-setting-options"></div><div id="resonance-single-line-setting"><div class="resonance-setting-label">Single-line lyrics · artwork layouts</div><div id="resonance-single-line-options" class="resonance-setting-options"></div><div class="resonance-setting-label">Keyword emphasis</div><div id="resonance-keyword-emphasis-options" class="resonance-setting-options"></div></div></div></div><div id="resonance-header-right"><div id="resonance-source" aria-label="Playback source"></div><div id="resonance-actions"><button id="resonance-album-panel-toggle" aria-expanded="false" aria-controls="resonance-album-panel">Album</button><button id="resonance-queue-toggle" aria-expanded="false" aria-controls="resonance-queue">Queue</button><button id="resonance-fullscreen">Fullscreen</button><button id="resonance-exit">Back to Spotify</button></div></div></header><aside id="resonance-album-panel" hidden aria-label="Album details"><div id="resonance-album-panel-header"><h2>Album details</h2><button id="resonance-album-panel-close" aria-label="Close album details">✕</button></div><div id="resonance-album-panel-content"></div></aside><aside id="resonance-queue" hidden aria-label="Upcoming songs"><div id="resonance-queue-header"><h2>Queue</h2><button id="resonance-queue-close" aria-label="Collapse queue">✕</button></div><div id="resonance-queue-current" aria-label="Currently playing"></div><div class="resonance-setting-label">Up next</div><ol id="resonance-queue-list"></ol><div id="resonance-queue-empty">No upcoming songs</div><button id="resonance-queue-more">Show more</button><div id="resonance-queue-status" role="status"></div></aside><main id="resonance-content"><div id="resonance-artwork"><div id="resonance-disc"><img id="resonance-cover-prev" alt="" aria-hidden="true" hidden><img id="resonance-cover" alt="Current album artwork"><div id="resonance-grooves"></div><div id="resonance-spindle"></div></div><div id="resonance-tonearm" aria-hidden="true"></div></div><div id="resonance-info"><div id="resonance-kicker">YOUR LISTENING SPACE</div><h1 id="resonance-title">Ready for music</h1><div id="resonance-artist">Play a song in Spotify</div><div id="resonance-album"></div></div><section id="resonance-expanded-lyrics" hidden aria-label="Karaoke lyrics"><div id="resonance-expanded-lines"></div><div id="resonance-expanded-note"></div></section><div id="resonance-interlude" hidden aria-label="Instrumental interlude"><i aria-hidden="true">♪</i><i aria-hidden="true">♫</i><i aria-hidden="true">♪</i></div><aside id="resonance-up-next" hidden aria-label="Up next"><div id="resonance-up-next-label">UP NEXT</div><div id="resonance-up-next-title"></div><div id="resonance-up-next-artist"></div></aside></main><section id="resonance-lyrics" aria-label="Current lyric"><div id="resonance-song-summary" hidden aria-label="Song details"><div id="resonance-summary-title"></div><div id="resonance-summary-artist"></div><div id="resonance-summary-album"></div></div><button id="resonance-lyric-line" disabled title="Seek to this lyric"></button><div id="resonance-lyric-tools"><div id="resonance-lyric-note"></div><button id="resonance-expand-lyrics" aria-expanded="false" aria-controls="resonance-expanded-lyrics">Karaoke</button></div></section><canvas id="resonance-waves" aria-hidden="true"></canvas><div id="resonance-player"><div id="resonance-progress"><span id="resonance-elapsed">0:00</span><input id="resonance-track" type="range" min="0" max="1" step="1000" value="0" aria-label="Song position" disabled><span id="resonance-duration">0:00</span></div><div id="resonance-controls"><button id="resonance-shuffle" aria-label="Enable shuffle" title="Enable shuffle" aria-pressed="false"></button><button id="resonance-previous" aria-label="Previous track" title="Previous track">⏮</button><button id="resonance-toggle" aria-label="Play or pause" title="Play or pause">▶</button><button id="resonance-next" aria-label="Next track" title="Next track">⏭</button><button id="resonance-repeat" aria-label="Repeat off" title="Repeat off" aria-pressed="false"></button><button id="resonance-like" aria-label="Add to Liked Songs" title="Add to Liked Songs" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button></div><div id="resonance-status" role="status"></div></div><footer id="resonance-caption">AMBIENT WAVES · ESC TO RETURN</footer>`;
+  root.innerHTML = `<div id="resonance-bg"></div><div id="resonance-aurora" aria-hidden="true"><div id="resonance-palette-a" class="resonance-palette-layer"></div><div id="resonance-palette-b" class="resonance-palette-layer"></div></div><div id="resonance-accent-bg" aria-hidden="true"></div><div id="resonance-beat-glow" aria-hidden="true"></div><div id="resonance-debug" aria-hidden="true"></div><div id="resonance-grain" aria-hidden="true"></div><header id="resonance-header"><div id="resonance-brand-wrap"><button id="resonance-brand" aria-label="Resonance appearance" aria-expanded="false" aria-controls="resonance-themes" title="Colors and visualizer">resonance</button><div id="resonance-themes" hidden role="dialog" aria-label="Resonance settings"><div class="resonance-menu-heading">Settings</div><details class="resonance-setting-group" open><summary>Look & layout</summary><div class="resonance-group-content"><div id="resonance-theme-label">Accent color</div><div id="resonance-swatches"></div><div class="resonance-setting-label">Background</div><div id="resonance-background-options" class="resonance-setting-options"></div><div class="resonance-setting-label">Artwork</div><div id="resonance-artwork-options" class="resonance-setting-options"></div><div class="resonance-setting-label">Layout</div><div id="resonance-layout-options" class="resonance-setting-options"></div></div></details><details class="resonance-setting-group"><summary>Visualizer</summary><div class="resonance-group-content"><div id="resonance-visual-label">Visualizer</div><div id="resonance-visual-options"></div><div class="resonance-setting-label">Motion</div><div id="resonance-motion-options" class="resonance-setting-options"></div><div id="resonance-analysis-info" style="font-size:10px;line-height:1.5;color:#ffffff70;margin-top:10px">Checking analysis availability</div><div class="resonance-setting-label">Beat pulse</div><div id="resonance-beat-ui-options" class="resonance-setting-options"></div></div></details><details class="resonance-setting-group"><summary>Lyrics</summary><div class="resonance-group-content"><div class="resonance-setting-label">Lyrics</div><div id="resonance-lyric-style-options" class="resonance-setting-options"></div><div class="resonance-setting-label">Lyric timing (this song)</div><div id="resonance-sync-options" class="resonance-setting-options"><span id="resonance-sync-value">0.0s</span></div><div id="resonance-sync-hint">[ shows lyrics earlier · ] later · \\ resets</div><div id="resonance-single-line-setting"><div class="resonance-setting-label">Single-line lyrics · artwork layouts</div><div id="resonance-single-line-options" class="resonance-setting-options"></div><div class="resonance-setting-label">Keyword emphasis</div><div id="resonance-keyword-emphasis-options" class="resonance-setting-options"></div></div></div></details><details class="resonance-setting-group"><summary>Advanced</summary><div class="resonance-group-content"><div class="resonance-setting-label">Debug overlay (D)</div><div id="resonance-debug-options" class="resonance-setting-options"></div></div></details></div></div><div id="resonance-header-right"><div id="resonance-source" aria-label="Playback source"></div><div id="resonance-actions"><button id="resonance-album-panel-toggle" aria-expanded="false" aria-controls="resonance-album-panel">Album</button><button id="resonance-queue-toggle" aria-expanded="false" aria-controls="resonance-queue">Queue</button><button id="resonance-fullscreen">Fullscreen</button><button id="resonance-exit">Back to Spotify</button></div></div></header><aside id="resonance-album-panel" hidden aria-label="Album details"><div id="resonance-album-panel-header"><h2>Album details</h2><button id="resonance-album-panel-close" aria-label="Close album details">✕</button></div><div id="resonance-album-panel-content"></div></aside><aside id="resonance-queue" hidden aria-label="Upcoming songs"><div id="resonance-queue-header"><h2>Queue</h2><button id="resonance-queue-close" aria-label="Collapse queue">✕</button></div><div id="resonance-queue-current" aria-label="Currently playing"></div><div class="resonance-setting-label">Up next</div><ol id="resonance-queue-list"></ol><div id="resonance-queue-empty">No upcoming songs</div><button id="resonance-queue-more">Show more</button><div id="resonance-queue-status" role="status"></div></aside><main id="resonance-content"><div id="resonance-artwork"><div id="resonance-disc"><img id="resonance-cover-prev" alt="" aria-hidden="true" hidden><img id="resonance-cover" alt="Current album artwork"><div id="resonance-grooves"></div><div id="resonance-spindle"></div></div><div id="resonance-tonearm" aria-hidden="true"></div></div><div id="resonance-info"><div id="resonance-kicker">YOUR LISTENING SPACE</div><h1 id="resonance-title">Ready for music</h1><div id="resonance-artist">Play a song in Spotify</div><div id="resonance-album"></div></div><section id="resonance-expanded-lyrics" hidden aria-label="Karaoke lyrics"><div id="resonance-expanded-lines"></div><div id="resonance-expanded-note"></div></section><div id="resonance-interlude" hidden aria-label="Instrumental interlude"><i aria-hidden="true">♪</i><i aria-hidden="true">♫</i><i aria-hidden="true">♪</i></div><aside id="resonance-up-next" hidden aria-label="Up next"><div id="resonance-up-next-label">UP NEXT</div><div id="resonance-up-next-title"></div><div id="resonance-up-next-artist"></div></aside></main><section id="resonance-lyrics" aria-label="Current lyric"><div id="resonance-song-summary" hidden aria-label="Song details"><div id="resonance-summary-title"></div><div id="resonance-summary-artist"></div><div id="resonance-summary-album"></div></div><button id="resonance-lyric-line" disabled title="Seek to this lyric"></button><div id="resonance-lyric-tools"><div id="resonance-lyric-note"></div><button id="resonance-expand-lyrics" aria-expanded="false" aria-controls="resonance-expanded-lyrics">Karaoke</button></div></section><canvas id="resonance-waves" aria-hidden="true"></canvas><div id="resonance-player"><div id="resonance-progress"><span id="resonance-elapsed">0:00</span><input id="resonance-track" type="range" min="0" max="1" step="1000" value="0" aria-label="Song position" disabled><span id="resonance-duration">0:00</span></div><div id="resonance-controls"><button id="resonance-shuffle" aria-label="Enable shuffle" title="Enable shuffle" aria-pressed="false"></button><button id="resonance-previous" aria-label="Previous track" title="Previous track">⏮</button><button id="resonance-toggle" aria-label="Play or pause" title="Play or pause">▶</button><button id="resonance-next" aria-label="Next track" title="Next track">⏭</button><button id="resonance-repeat" aria-label="Repeat off" title="Repeat off" aria-pressed="false"></button><button id="resonance-like" aria-label="Add to Liked Songs" title="Add to Liked Songs" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button></div><div id="resonance-status" role="status"></div></div><footer id="resonance-caption">AMBIENT WAVES · ESC TO RETURN</footer>`;
   document.body.append(launch,root);
   const get = id => document.getElementById('resonance-'+id);
   const themes={sage:[191,220,179],sky:[161,203,236],lavender:[199,181,234],rose:[235,177,191],amber:[232,201,143]};
@@ -381,7 +408,7 @@
   get('brand').onclick=()=>{get('themes').hidden=!get('themes').hidden;get('brand').setAttribute('aria-expanded',String(!get('themes').hidden));wakeControls();};
   document.addEventListener('pointerdown',event=>{if(!get('brand-wrap').contains(event.target)){get('themes').hidden=true;get('brand').setAttribute('aria-expanded','false');}});
   let artwork = '', phase = 0, previous = 0, frame = 0, oldFocus;
-  let savingURI = '', checkedURI = '', checkingURI = '';
+  let savingURI = '', checkedURI = '';
   const savedTracks = new Map();
   function currentTrack() {
     try { return Spicetify.Player.data?.item || Spicetify.Player.origin?._state?.item || null; } catch { return null; }
@@ -402,38 +429,50 @@
     const uri = currentURI(), available = /^spotify:track:[A-Za-z0-9]+$/.test(uri);
     const saved = savedTracks.get(uri) === true;
     const label = savingURI === uri && uri ? 'Saving to Liked Songs…' : (saved ? 'Remove from Liked Songs' : 'Add to Liked Songs');
-    get('like').disabled = !available || savingURI === uri;
+    get('like').disabled = !available || savingURI === uri || (!savedTracks.has(uri)&&heartChecks.has(uri));
     get('like').setAttribute('aria-pressed', String(saved));
     get('like').setAttribute('aria-label', label); get('like').title = label;
   }
+  const heartChecks=new Map(),heartVersions=new Map();
   async function checkHeart() {
-    const uri = currentURI();
+    const uri=currentURI();
     renderHeart();
-    if(!uri.startsWith('spotify:track:') || checkedURI === uri || checkingURI === uri) return;
-    const api = window.Spicetify?.Platform?.LibraryAPI;
-    if(!api?.contains) return;
-    checkingURI = uri;
-    try {
-      const [saved] = await api.contains(uri);
-      savedTracks.set(uri, Boolean(saved)); checkedURI = uri;
-      if(currentURI() === uri) renderHeart();
-    } catch { checkedURI = uri; }
-    finally { if(checkingURI === uri) checkingURI = ''; }
+    if(!/^spotify:track:[A-Za-z0-9]+$/.test(uri)||checkedURI===uri)return;
+    if(heartChecks.has(uri))return heartChecks.get(uri);
+    const api=window.Spicetify?.Platform?.LibraryAPI;
+    if(!api?.contains)return;
+    const version=heartVersions.get(uri)||0;
+    const request=(async()=>{
+      try {
+        const [saved]=await Promise.resolve().then(()=>api.contains(uri));
+        if((heartVersions.get(uri)||0)!==version)return;
+        savedTracks.set(uri,Boolean(saved));checkedURI=uri;
+      }catch {checkedURI=uri;}
+      finally {heartChecks.delete(uri);if(currentURI()===uri)renderHeart();}
+    })();
+    heartChecks.set(uri,request);renderHeart();
+    return request;
   }
-  get('like').onclick = async () => {
-    const uri = currentURI();
-    if(!/^spotify:track:[A-Za-z0-9]+$/.test(uri) || savingURI) return;
-    const wasSaved=savedTracks.get(uri)===true;
-    savingURI = uri; renderHeart(); text('status','');
+  get('like').onclick=async()=>{
+    const uri=currentURI();
+    if(!/^spotify:track:[A-Za-z0-9]+$/.test(uri)||savingURI)return;
+    savingURI=uri;renderHeart();text('status','');
     try {
-      const api = window.Spicetify?.Platform?.LibraryAPI;
-      if(!api?.add || !api?.remove) throw new Error('Library unavailable');
-      await (wasSaved ? api.remove({uris:[uri]}) : api.add({uris:[uri]}));
-      savedTracks.set(uri,!wasSaved);
-      if(currentURI() === uri) flashStatus(wasSaved?'Removed from Liked Songs':'Added to Liked Songs');
-    } catch {
-      if(currentURI() === uri) text('status','Couldn’t update Liked Songs. Try the heart again.');
-    } finally { savingURI = ''; renderHeart(); }
+      if(!savedTracks.has(uri)){
+        checkedURI='';await checkHeart();
+        if(currentURI()!==uri)return;
+        if(!savedTracks.has(uri))throw Error('Saved state unavailable');
+      }
+      const wasSaved=savedTracks.get(uri)===true;
+      const api=window.Spicetify?.Platform?.LibraryAPI;
+      if(!api?.add||!api?.remove)throw Error('Library unavailable');
+      heartVersions.set(uri,(heartVersions.get(uri)||0)+1);
+      await (wasSaved?api.remove({uris:[uri]}):api.add({uris:[uri]}));
+      savedTracks.set(uri,!wasSaved);checkedURI=uri;
+      if(currentURI()===uri)flashStatus(wasSaved?'Removed from Liked Songs':'Added to Liked Songs');
+    }catch {
+      if(currentURI()===uri)text('status','Couldn’t update Liked Songs. Try the heart again.');
+    }finally {savingURI='';renderHeart();}
   };
   const icons = {
     repeat:'<path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4m14-1v2a3 3 0 0 1-3 3H3"/>',
@@ -528,6 +567,7 @@
         const query=new URLSearchParams({track_name:meta.title,artist_name:meta.artist_name||'',album_name:meta.album_title||'',duration:String(Math.round(duration/1000))});
         const response=await fetch('https://lrclib.net/api/get?'+query,{signal:abort.signal});
         if(response.ok){const data=await response.json();
+          if(generation!==lyricLoad)return;
           const validTitle=!data.trackName||normalize(data.trackName)===normalize(meta.title);
           const validDuration=!data.duration||Math.abs(data.duration*1000-duration)<2500;
           if(validTitle&&validDuration){const rows=ResonanceLyrics.lrc(data.syncedLyrics,duration);accept(rows,'LRCLIB');if(data.instrumental&&!lyricRows.length)lyricState='Instrumental';}
@@ -636,7 +676,7 @@
     get('expand-lyrics').textContent=expandedLyrics?'Exit karaoke':'Karaoke';get('expand-lyrics').setAttribute('aria-expanded',String(expandedLyrics));
     if(expandedLyrics&&root.dataset.lyricStyle==='off')setLyricStyle('animated');
     syncLyricsVisibility();
-    drawLyrics();
+    drawLyrics();fitArtwork();
   }
   function toggleExpanded(){
     if(expandedLyrics)setLayout(returnLayout);else {returnLayout=root.dataset.layout==='center'?'center':'left';setLayout('karaoke');}
@@ -656,7 +696,18 @@
 
   const setLayout=appearanceOption('layout',{left:'Art left',center:'Art centered',lyrics:'Lyrics only',karaoke:'Karaoke'},'left');
   const setSingleLine=appearanceOption('single-line',{on:'On',off:'Off'},'on');
-  window.addEventListener('resize',()=>{fitLyric();expandedKey='';});
+  function fitArtwork(){
+    const content=get('content'),height=content.clientHeight;
+    if(!height)return;
+    const metadata=root.dataset.layout==='center'?get('info').offsetHeight+16:0;
+    const size=Math.max(0,height-metadata-(root.dataset.layout==='center'?16:28));
+    root.style.setProperty('--art-max-size',size+'px');
+  }
+  if(typeof ResizeObserver==='function'){
+    const artworkSizer=new ResizeObserver(fitArtwork);
+    artworkSizer.observe(get('content'));artworkSizer.observe(get('info'));
+  }
+  window.addEventListener('resize',()=>{fitLyric();fitArtwork();expandedKey='';});
   let shuffleBusy=false;
   function shuffleState() {
     try { const state=Spicetify.Player.getShuffle(); if(typeof state==='boolean')return state; }catch{}
@@ -834,22 +885,23 @@
   root.onpointermove=root.onpointerdown=root.onkeydown=root.onfocusin=wakeControls;
   document.addEventListener('fullscreenchange',wakeControls);
   const fmt = ms => `${Math.floor(Math.max(0,ms)/60000)}:${String(Math.floor(Math.max(0,ms)/1000)%60).padStart(2,'0')}`;
-  let seekingURI='';
+  let seekingURI='',seekCanceled=false;
   function paintPosition(position,duration) {
     const bar=get('track');bar.value=String(position);bar.style.setProperty('--progress',(duration>0?Math.min(100,Math.max(0,position/duration*100)):0)+'%');
     bar.setAttribute('aria-valuetext',fmt(position)+' of '+fmt(duration));text('elapsed',fmt(position));
   }
-  get('track').onpointerdown=()=>{seekingURI=currentURI();};
-  get('track').oninput=()=>{if(!seekingURI)seekingURI=currentURI();paintPosition(Number(get('track').value),Number(get('track').max));};
+  get('track').onpointerdown=()=>{seekingURI=currentURI();seekCanceled=false;};
+  get('track').onkeydown=event=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(event.key)){seekingURI=currentURI();seekCanceled=false;}};
+  get('track').oninput=()=>{if(seekCanceled)return;if(!seekingURI)seekingURI=currentURI();paintPosition(Number(get('track').value),Number(get('track').max));};
   get('track').onchange=async()=>{
-    const uri=seekingURI||currentURI(),position=Math.round(Number(get('track').value));seekingURI='';
-    if(!uri||uri!==currentURI()){update();return;}
+    const uri=seekingURI||currentURI(),position=Math.round(Number(get('track').value)),canceled=seekCanceled;seekingURI='';seekCanceled=false;
+    if(canceled||!uri||uri!==currentURI()){update();return;}
     try {await Spicetify.Player.seek(Math.max(0,Math.min(position,Spicetify.Player.getDuration())));}
     catch {flashStatus('Couldn’t seek in this song.');}
     setTimeout(update,250);
   };
-  get('track').onpointercancel=()=>{seekingURI='';update();};
-  get('track').onblur=()=>{seekingURI='';update();};
+  get('track').onpointercancel=()=>{seekCanceled=true;seekingURI='';update();};
+  get('track').onblur=()=>{seekCanceled=true;seekingURI='';update();};
   function renderUpNext(progress,duration) {
     const preview=get('up-next');preview.hidden=true;
     if(!(duration>0&&duration-progress<=20000&&duration-progress>0))return;
@@ -987,7 +1039,7 @@
     }
     let progress = 0, duration = 0;
     try { progress = Spicetify.Player.getProgress(); duration = Spicetify.Player.getDuration(); } catch {}
-    if(seekingURI&&seekingURI!==currentURI())seekingURI='';
+    if(seekingURI&&seekingURI!==currentURI()){seekCanceled=true;seekingURI='';}
     get('track').max=String(Math.max(1,duration));get('track').disabled=!(duration>0)||!currentURI();
     if(!seekingURI)paintPosition(progress,duration);
     renderUpNext(progress,duration);
@@ -1116,10 +1168,15 @@
   }
 
   function close() { cancelAnimationFrame(lyricScroll);clearTimeout(idleTimer);root.dataset.idle='false';root.hidden=true;cancelAnimationFrame(frame);if(document.fullscreenElement===root) document.exitFullscreen().catch(()=>{});oldFocus?.focus(); }
-  launch.onclick = () => {oldFocus=document.activeElement;root.hidden=false;checkedURI='';update();wakeControls();get('exit').focus();previous=0;cancelAnimationFrame(frame);frame=requestAnimationFrame(draw);};
+  launch.onclick = () => {oldFocus=document.activeElement;root.hidden=false;checkedURI='';update();wakeControls();get('exit').focus();previous=0;fitArtwork();cancelAnimationFrame(frame);frame=requestAnimationFrame(draw);};
   get('exit').onclick=close;
   get('fullscreen').onclick=async()=>{try{if(document.fullscreenElement===root) await document.exitFullscreen();else await root.requestFullscreen();}catch{text('status','Use Spotify’s View menu to enter fullscreen.');}};
-  document.addEventListener('keydown',e=>{if(!root.hidden&&e.key==='Escape'){close();e.stopPropagation();}});
+  document.addEventListener('keydown',event=>{
+    if(root.hidden||event.key!=='Escape')return;
+    if(!get('themes').hidden){get('themes').hidden=true;get('brand').setAttribute('aria-expanded','false');get('brand').focus();}
+    else close();
+    event.preventDefault();event.stopPropagation();
+  });
   document.addEventListener('keydown',e=>{
     if(root.hidden||e.metaKey||e.ctrlKey||e.altKey)return;
     const target=e.target,tag=(target?.tagName||'').toLowerCase();

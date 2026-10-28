@@ -1,6 +1,6 @@
 # Resonance
 
-An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS and Windows installation tools. Current source revision: **4.8**.
+An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS and Windows installation tools. Current source revision: **4.9**.
 
 [![Cross-platform checks](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml/badge.svg)](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml)
 
@@ -30,7 +30,7 @@ An album-focused listening interface inside Spotify desktop, built with Spicetif
 ./resonance.command update
 ```
 
-The updater rebuilds the bundle, registers the extension and applies it. Spotify restarts. Open **Resonance** near the top of Spotify. Click the **resonance** name inside the view for appearance settings. Escape returns to Spotify.
+The updater rebuilds the bundle, registers the extension and applies it. Spotify restarts. Open **Resonance** near the top of Spotify. Click the **resonance** name inside the view for grouped Look & layout, Visualizer, Lyrics and Advanced settings. Escape dismisses settings first, then returns to Spotify. Escape returns to Spotify.
 
 The updater is local: it installs the source in this folder, without downloading a newer release. After pulling a repository update, run it again. Double-clickable Update, Check and Uninstall command files are also included.
 
@@ -105,7 +105,13 @@ Requires Node.js 18+ for JavaScript tests and Python 3.9+ for maintenance/tests.
 ./build-extension.command
 node tests/check-extension.cjs
 node tests/check-lyrics.cjs
+node tests/check-races.cjs
 python3 -m unittest discover -s tests -p test_maintenance.py
 ```
 
 Tests cover playback/library actions, queues, lyric timing and translations, offsets, visual features, artwork/layout state, failure handling and maintenance operations. Live service compatibility cannot be established by mocked tests alone.
+
+
+### Optional layout QA
+
+`tests/preview/` is an isolated browser fixture with authored demo artwork and fictional lyrics; it does not connect to a Spotify account. Serve this repository on loopback with `python3 -m http.server 8766 --bind 127.0.0.1`, then open `http://127.0.0.1:8766/tests/preview/`. With agent-browser, open Resonance, enable reduced motion for stable measurements and evaluate `tests/preview/assert-layout.js` at the desired viewport. The checks catch artwork/lyrics overlap and off-screen controls across all four layouts.
