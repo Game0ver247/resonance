@@ -1,0 +1,84 @@
+import configparser
+import importlib.util
+from pathlib import Path
+import plistlib
+import subprocess
+import tempfile
+import unittest
+
+spec=importlib.util.spec_from_file_location('maintenance',Path(__file__).resolve().parents[1]/'maintenance.py')
+module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+
+class MaintenanceTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name);self.project=self.root/'project';self.project.mkdir()
+        (self.project/'lyrics-engine.js').write_text('// engine')
+        (self.project/'display-ui.js').write_text('// [Resonance] Artwork display ready')
+        self.config_path=self.root/'config'/'config-xpui.ini';self.config_path.parent.mkdir()
+        self.resources=self.root/'Spotify.app'/'Contents'/'Resources';self.resources.mkdir(parents=True)
+        self.version='1.3.6.1921';self.write_version()
+        self.config=configparser.ConfigParser();self.config.read_dict({'Setting':{'spotify_path':str(self.resources),'current_theme':''},'AdditionalOptions':{'extensions':module.EXTENSION,'custom_apps':''},'Backup':{'version':self.version+'.ghash'}});self.save_config()
+        self.manager=module.Resonance(self.project,cli='fake-spicetify',config_path=self.config_path,runner=self.run_cli)
+        self.manager.installed.parent.mkdir();self.manager.installed.write_bytes(self.manager.source_bundle());self.apply()
+    def tearDown(self):self.temp.cleanup()
+    def write_version(self):
+        with (self.resources.parent/'Info.plist').open('wb') as stream:plistlib.dump({'CFBundleShortVersionString':self.version},stream)
+    def save_config(self):
+        with self.config_path.open('w') as stream:self.config.write(stream)
+    def apply(self):
+        self.manager.xpui.mkdir(parents=True,exist_ok=True);(self.manager.xpui/'helper').mkdir(exist_ok=True);(self.manager.xpui/'helper'/'spicetifyWrapper.js').write_text('wrapper')
+        self.manager.applied.parent.mkdir(exist_ok=True)
+        index='helper/spicetifyWrapper.js'
+        if module.EXTENSION in self.config['AdditionalOptions']['extensions'].split('|'):
+            index+=' extensions/'+module.EXTENSION;self.manager.applied.write_bytes(self.manager.installed.read_bytes())
+        elif self.manager.applied.exists():self.manager.applied.unlink()
+        (self.manager.xpui/'index.html').write_text(index)
+    def run_cli(self,cmd,**kwargs):
+        args=cmd[1:]
+        if args[0]=='config':
+            items=self.config['AdditionalOptions']['extensions'].split('|');name=args[2]
+            if name.endswith('-'):items=[i for i in items if i!=name[:-1]]
+            elif name not in items:items.append(name)
+            self.config['AdditionalOptions']['extensions']='|'.join(items);self.save_config()
+        elif args==['restore']:(self.manager.xpui/'index.html').write_text('vanilla')
+        else:
+            if args[0]=='backup':self.config['Backup']['version']=self.version+'.ghash';self.save_config()
+            self.apply()
+        return subprocess.CompletedProcess(cmd,0)
+    def test_healthy_and_missing_injection(self):
+        self.assertEqual(self.manager.check()['status'],'healthy')
+        (self.manager.xpui/'index.html').write_text('vanilla')
+        self.assertTrue(any('loader' in x for x in self.manager.check()['issues']))
+    def test_version_change_uses_backup_and_records_success(self):
+        self.version='1.4.0.1';self.write_version();self.manager.update()
+        self.assertIn(['backup','apply'],self.manager.commands)
+        self.assertEqual(self.manager.check()['status'],'healthy')
+        self.version='1.5.0.1';self.write_version()
+        self.assertTrue(any('changed since' in x for x in self.manager.check()['issues']))
+    def test_dry_run_changes_nothing(self):
+        before={p:p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
+        self.manager.update(dry_run=True);self.manager.uninstall(dry_run=True)
+        after={p:p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
+        self.assertEqual(before,after)
+    def test_uninstall_preserves_other_customizations(self):
+        self.config['AdditionalOptions']['extensions']+='|other.js';self.save_config();self.manager.uninstall()
+        self.assertIn(['apply'],self.manager.commands);self.assertNotIn(['restore'],self.manager.commands)
+        self.assertEqual(module.read_config(self.config_path)['AdditionalOptions']['extensions'],'other.js')
+        self.assertFalse(self.manager.installed.exists());self.assertTrue((self.project/'display-ui.js').exists())
+    def test_sole_extension_uninstall_restores_vanilla(self):
+        self.manager.uninstall();self.assertIn(['restore'],self.manager.commands)
+        self.assertEqual((self.manager.xpui/'index.html').read_text(),'vanilla')
+    def test_uninstall_does_not_restore_stale_backup(self):
+        self.version='1.5.0.1';self.write_version()
+        with self.assertRaisesRegex(RuntimeError,'backup differ'):self.manager.uninstall()
+        self.assertEqual(self.manager.commands,[])
+    def test_failure_does_not_record_healthy_state(self):
+        def fail(*args,**kwargs):raise subprocess.CalledProcessError(1,args[0])
+        self.manager.runner=fail
+        with self.assertRaises(subprocess.CalledProcessError):self.manager.update()
+        self.assertFalse(self.manager.state_path.exists())
+    def test_applied_corruption(self):
+        self.manager.applied.write_text('broken')
+        self.assertTrue(any('different extension' in x for x in self.manager.check()['issues']))
+
+if __name__=='__main__':unittest.main()
