@@ -54,9 +54,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Fedora regression checks
         run: |
+          sha256sum resonanceDisplay.js > /tmp/resonance-bundle.sha256
           python3 -m unittest discover -s tests -p 'test_*.py'
           npm test
           sh -n resonance.sh build-extension.sh
           ./resonance.sh --help
           ./build-extension.sh
-          git diff --exit-code -- resonanceDisplay.js
+          sha256sum -c /tmp/resonance-bundle.sha256
