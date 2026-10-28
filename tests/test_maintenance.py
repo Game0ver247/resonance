@@ -5,6 +5,8 @@ import plistlib
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
+import sys
 
 spec=importlib.util.spec_from_file_location('maintenance',Path(__file__).resolve().parents[1]/'maintenance.py')
 module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
@@ -24,7 +26,7 @@ class MaintenanceTests(unittest.TestCase):
     def write_version(self):
         with (self.resources.parent/'Info.plist').open('wb') as stream:plistlib.dump({'CFBundleShortVersionString':self.version},stream)
     def save_config(self):
-        with self.config_path.open('w') as stream:self.config.write(stream)
+        with self.config_path.open('w', encoding='utf-8') as stream:self.config.write(stream)
     def apply(self):
         self.manager.xpui.mkdir(parents=True,exist_ok=True);(self.manager.xpui/'helper').mkdir(exist_ok=True);(self.manager.xpui/'helper'/'spicetifyWrapper.js').write_text('wrapper')
         self.manager.applied.parent.mkdir(exist_ok=True)
@@ -80,5 +82,40 @@ class MaintenanceTests(unittest.TestCase):
     def test_applied_corruption(self):
         self.manager.applied.write_text('broken')
         self.assertTrue(any('different extension' in x for x in self.manager.check()['issues']))
+
+class WindowsMaintenanceTests(MaintenanceTests):
+    """Exercise all lifecycle paths with a Windows Spotify layout."""
+    def setUp(self):
+        super().setUp()
+        self.resources=self.root/'Spotify Windows \u03a9';self.resources.mkdir()
+        (self.resources/'Spotify.exe').write_bytes(b'fixture')
+        self.config['Setting']['spotify_path']=str(self.resources);self.save_config()
+        version_patch=patch.object(module,'windows_file_version',side_effect=lambda path:self.version)
+        version_patch.start();self.addCleanup(version_patch.stop)
+        self.manager.reload();self.apply()
+
+    def test_windows_version_and_install_paths(self):
+        self.assertEqual(self.manager.version,self.version)
+        self.assertEqual(self.manager.xpui,self.resources/'Apps'/'xpui')
+        self.assertEqual(self.manager.installed,self.config_path.parent/'Extensions'/module.EXTENSION)
+        self.manager.update()
+        self.assertEqual(self.manager.check()['status'],'healthy')
+
+    def test_unreadable_windows_version_stops_before_mutations(self):
+        with patch.object(module,'windows_file_version',return_value=''):
+            with self.assertRaisesRegex(RuntimeError,'version is unreadable'):
+                self.manager.update()
+        self.assertEqual(self.manager.commands,[])
+
+
+class NativeWindowsVersionTests(unittest.TestCase):
+    @unittest.skipUnless(sys.platform=='win32','native executable version check requires Windows')
+    def test_reads_real_executable(self):
+        self.assertRegex(module.windows_file_version(Path(sys.executable)),r'^\d+\.\d+\.\d+\.\d+$')
+
+    @unittest.skipUnless(sys.platform=='win32','native executable version check requires Windows')
+    def test_missing_executable_has_no_version(self):
+        self.assertEqual(module.windows_file_version(Path('missing-resonance-test-file.exe')),'')
+
 
 if __name__=='__main__':unittest.main()

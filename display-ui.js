@@ -1,6 +1,6 @@
 // NAME: Resonance Display
 // AUTHOR: Local customization
-// VERSION: 4.7
+// VERSION: 4.8
 // DESCRIPTION: Album-focused Spotify listening view with synced lyrics, track-analysis visuals and playback controls.
 (() => {
   if (document.getElementById('resonance-launch')) return;
@@ -73,8 +73,8 @@
   #resonance-caption {position:relative;text-align:center;font:10px monospace;letter-spacing:1.5px;color:#ffffff65;padding:0 15px 18px}
   #resonance-status {font:11px sans-serif;color:#ffd19b;min-height:14px}
   #resonance-lyrics {position:relative;flex-shrink:0;width:86vw;max-width:1180px;align-self:center;min-height:90px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;padding:8px 0}
-  #resonance-lyric-line {white-space:nowrap;max-width:100%;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;font-size:32px;line-height:1.35;font-weight:650;letter-spacing:-.035em;color:#f4f5f1;overflow:hidden;min-height:44px;will-change:opacity,transform}
-  #resonance-root #resonance-lyric-line {font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;font-weight:650;letter-spacing:-.035em;border:0;background:transparent;padding:0;cursor:pointer}
+  #resonance-lyric-line {white-space:nowrap;max-width:100%;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI Variable Text","Segoe UI","Helvetica Neue",sans-serif;font-size:32px;line-height:1.35;font-weight:650;letter-spacing:-.035em;color:#f4f5f1;overflow:hidden;min-height:44px;will-change:opacity,transform}
+  #resonance-root #resonance-lyric-line {font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI Variable Text","Segoe UI",sans-serif;font-weight:650;letter-spacing:-.035em;border:0;background:transparent;padding:0;cursor:pointer}
   #resonance-root #resonance-lyric-line:disabled {cursor:default}
   #resonance-root[data-keyword-emphasis="on"] #resonance-lyric-line .resonance-keyword {color:var(--lyric-album-color,#e2e5e2);-webkit-text-stroke:.65px rgba(0,0,0,.85);paint-order:stroke fill;text-shadow:0 1px 3px #0002;transition:color 1s ease,text-shadow 1s ease}
   #resonance-lyric-line:focus-visible,#resonance-expanded-lines button:focus-visible {outline:1px solid var(--accent);outline-offset:4px;border-radius:6px}
@@ -83,7 +83,7 @@
   #resonance-expanded-lyrics {grid-column:2;grid-row:1;min-width:0;width:100%;height:42vh;overflow:auto;padding:0 12px;z-index:1;overscroll-behavior:contain;scrollbar-width:none;mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent)}
   #resonance-expanded-lyrics[hidden] {display:none}
   #resonance-expanded-lines {display:flex;flex-direction:column;gap:16px;align-items:center;padding-block:calc(21vh - 24px)}
-  #resonance-root #resonance-expanded-lines button {font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;font-weight:650;font-size:clamp(16px,2vw,30px);letter-spacing:-.03em;line-height:1.3;border:0;background:transparent;padding:3px 6px;text-align:center;color:#ffffff60;transition:color .28s;white-space:normal}
+  #resonance-root #resonance-expanded-lines button {font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI Variable Text","Segoe UI",sans-serif;font-weight:650;font-size:clamp(16px,2vw,30px);letter-spacing:-.03em;line-height:1.3;border:0;background:transparent;padding:3px 6px;text-align:center;color:#ffffff60;transition:color .28s;white-space:normal}
   #resonance-root #resonance-expanded-lines button[aria-current="true"] {color:#f4f5f1}
   #resonance-root #resonance-expanded-lines button:hover {color:var(--accent)}
   #resonance-expanded-note {text-align:center;color:#ffffff70;font-size:14px}
@@ -177,7 +177,7 @@
   #resonance-root[data-lyric-style="animated"] #resonance-expanded-lines button:hover,#resonance-root[data-lyric-style="animated"] #resonance-expanded-lines button:focus-visible {filter:blur(0);opacity:1}
   #resonance-interlude {grid-column:2;grid-row:1;align-self:center;z-index:1;display:flex;align-items:center;justify-content:center;gap:7px;height:40px;position:relative;pointer-events:none}
   #resonance-interlude[hidden] {display:none}
-  #resonance-interlude i,.resonance-interlude-note {display:inline-block;font-family:"Apple Symbols",-apple-system,sans-serif;font-size:24px;font-style:normal;line-height:1;color:var(--lyric-ink,var(--accent));animation:resonance-interlude 1.8s ease-in-out infinite;animation-play-state:paused}
+  #resonance-interlude i,.resonance-interlude-note {display:inline-block;font-family:"Apple Symbols","Segoe UI Symbol",-apple-system,sans-serif;font-size:24px;font-style:normal;line-height:1;color:var(--lyric-ink,var(--accent));animation:resonance-interlude 1.8s ease-in-out infinite;animation-play-state:paused}
   #resonance-interlude i:nth-child(2),.resonance-interlude-note:nth-child(2) {animation-delay:.2s}#resonance-interlude i:nth-child(3),.resonance-interlude-note:nth-child(3) {animation-delay:.4s}
   #resonance-root[data-playing="true"] #resonance-interlude i,#resonance-root[data-playing="true"] .resonance-interlude-note {animation-play-state:running}
   @keyframes resonance-interlude {0%,100%{opacity:.3;transform:translateY(2px) scale(.75)}50%{opacity:1;transform:translateY(-3px) scale(1)}}

@@ -7,6 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 import plistlib
+import os
 import re
 import shutil
 import subprocess
@@ -17,7 +18,7 @@ EXTENSION = 'resonanceDisplay.js'
 
 def read_config(path):
     config = configparser.ConfigParser(interpolation=None, strict=False)
-    if not config.read(path):
+    if not config.read(path, encoding='utf-8-sig'):
         raise RuntimeError('Spicetify config not found: ' + str(path))
     return config
 
@@ -30,6 +31,50 @@ def compatible(version, backup):
     return bool(version and backup and (backup == version or backup.startswith(version + '.')))
 
 
+def windows_file_version(path):
+    """Read the executable's fixed product version with the native Windows API."""
+    if sys.platform != 'win32':
+        return ''
+    import ctypes
+    from ctypes import wintypes
+    class FixedFileInfo(ctypes.Structure):
+        _fields_ = [(name, wintypes.DWORD) for name in (
+            'signature', 'struct_version', 'file_ms', 'file_ls', 'product_ms',
+            'product_ls', 'flags_mask', 'flags', 'os', 'type', 'subtype', 'date_ms', 'date_ls')]
+    api = ctypes.WinDLL('version', use_last_error=True)
+    api.GetFileVersionInfoSizeW.argtypes = [wintypes.LPCWSTR, ctypes.POINTER(wintypes.DWORD)]
+    api.GetFileVersionInfoSizeW.restype = wintypes.DWORD
+    api.GetFileVersionInfoW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, ctypes.c_void_p]
+    api.GetFileVersionInfoW.restype = wintypes.BOOL
+    api.VerQueryValueW.argtypes = [ctypes.c_void_p, wintypes.LPCWSTR, ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(wintypes.UINT)]
+    api.VerQueryValueW.restype = wintypes.BOOL
+    size = api.GetFileVersionInfoSizeW(str(path), None)
+    if not size:
+        return ''
+    buffer = ctypes.create_string_buffer(size)
+    if not api.GetFileVersionInfoW(str(path), 0, size, buffer):
+        return ''
+    pointer, length = ctypes.c_void_p(), wintypes.UINT()
+    if not api.VerQueryValueW(buffer, '\\', ctypes.byref(pointer), ctypes.byref(length)) or length.value < ctypes.sizeof(FixedFileInfo):
+        return ''
+    info = ctypes.cast(pointer, ctypes.POINTER(FixedFileInfo)).contents
+    if info.signature != 0xFEEF04BD:
+        return ''
+    ms, ls = (info.product_ms, info.product_ls) if info.product_ms else (info.file_ms, info.file_ls)
+    return '.'.join(str(value) for value in (ms >> 16, ms & 0xffff, ls >> 16, ls & 0xffff))
+
+
+def spotify_version(resources):
+    executable = resources / 'Spotify.exe'
+    if executable.is_file():
+        return windows_file_version(executable)
+    try:
+        with (resources.parent / 'Info.plist').open('rb') as stream:
+            return plistlib.load(stream).get('CFBundleShortVersionString', '')
+    except (OSError, ValueError, plistlib.InvalidFileException):
+        return ''
+
+
 class Resonance:
     def __init__(self, project, cli=None, config_path=None, runner=None):
         self.project = Path(project).resolve()
@@ -38,7 +83,7 @@ class Resonance:
             raise RuntimeError('Spicetify is missing. Install spicetify-cli, then run this command again.')
         self.runner = runner or subprocess.run
         if config_path is None:
-            result = self.runner([self.cli, '-c'], check=True, capture_output=True, text=True)
+            result = self.runner([self.cli, '-c'], check=True, capture_output=True, text=True, encoding='utf-8')
             config_path = result.stdout.strip()
         self.config_path = Path(config_path).expanduser()
         self.config_dir = self.config_path.parent
@@ -48,21 +93,15 @@ class Resonance:
 
     def reload(self):
         self.config = read_config(self.config_path)
-        self.resources = Path(self.config.get('Setting', 'spotify_path')).expanduser()
+        self.resources = Path(os.path.expandvars(self.config.get('Setting', 'spotify_path'))).expanduser()
         self.xpui = self.resources / 'Apps' / 'xpui'
         self.installed = self.config_dir / 'Extensions' / EXTENSION
         self.applied = self.xpui / 'extensions' / EXTENSION
-        self.version = ''
-        try:
-            with (self.resources.parent / 'Info.plist').open('rb') as stream:
-                info = plistlib.load(stream)
-            self.version = info.get('CFBundleShortVersionString', '')
-        except (OSError, ValueError, plistlib.InvalidFileException):
-            pass
+        self.version = spotify_version(self.resources)
         self.backup_version = self.config.get('Backup', 'version', fallback='')
-        self.index = (self.xpui / 'index.html').read_text(errors='replace') if (self.xpui / 'index.html').is_file() else ''
+        self.index = (self.xpui / 'index.html').read_text(encoding='utf-8', errors='replace') if (self.xpui / 'index.html').is_file() else ''
         try:
-            self.state = json.loads(self.state_path.read_text())
+            self.state = json.loads(self.state_path.read_text(encoding='utf-8'))
         except (OSError, ValueError):
             self.state = {}
 
@@ -90,7 +129,7 @@ class Resonance:
             issues.append('Applied extension file is missing from Spotify.')
         elif digest(self.installed) != digest(self.applied):
             issues.append('Spotify has a different extension build than Spicetify; reapply it.')
-        if self.installed.is_file() and '[Resonance] Artwork display ready' not in self.installed.read_text(errors='replace'):
+        if self.installed.is_file() and '[Resonance] Artwork display ready' not in self.installed.read_text(encoding='utf-8', errors='replace'):
             issues.append('Installed Resonance extension looks incomplete.')
         source = self.source_bundle()
         return {
@@ -125,7 +164,7 @@ class Resonance:
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
         values['updated_at'] = datetime.now(timezone.utc).isoformat()
         temporary = self.state_path.with_suffix('.tmp')
-        temporary.write_text(json.dumps(values, indent=2) + '\n')
+        temporary.write_text(json.dumps(values, indent=2) + '\n', encoding='utf-8')
         temporary.replace(self.state_path)
 
     def update(self, dry_run=False):
@@ -200,7 +239,7 @@ def main():
                 if report['local_update_available']:
                     print('Local source is newer/different; run update to install it.')
                 if report['issues']:
-                    print('Repair: run this command with update. If Spicetify cannot apply, update spicetify-cli through Homebrew and retry.')
+                    print('Repair: run this command with update. If Spicetify cannot apply, update Spicetify using your package manager or its official instructions and retry.')
                 print(report['scope'])
             return 1 if report['issues'] else 0
         getattr(manager, args.action)(dry_run=args.dry_run)

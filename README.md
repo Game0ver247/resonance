@@ -1,6 +1,8 @@
 # Resonance
 
-An album-focused listening interface inside Spotify desktop, built with Spicetify. Designed and tested on macOS. Current source revision: **4.7**.
+An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS and Windows installation tools. Current source revision: **4.8**.
+
+[![Cross-platform checks](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml/badge.svg)](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml)
 
 ## Features
 
@@ -33,6 +35,27 @@ The updater rebuilds the bundle, registers the extension and applies it. Spotify
 The updater is local: it installs the source in this folder, without downloading a newer release. After pulling a repository update, run it again. Double-clickable Update, Check and Uninstall command files are also included.
 
 Manual installation of the generated `resonanceDisplay.js` follows the [Spicetify extension instructions](https://spicetify.app/docs/customization/extensions).
+
+## Install on Windows
+
+1. Install Spotify desktop and sign in. Set up Spicetify using its [official Windows instructions](https://spicetify.app/docs/getting-started). For example, its documented Winget package is `Spicetify.Spicetify`. Reopen Terminal after installing so Spicetify is on PATH.
+2. Install **Python 3.9+** with its launcher or Python on PATH. No other Python packages are needed.
+3. Download and extract the Windows ZIP from [Releases](https://github.com/Game0ver247/resonance/releases/latest), or clone this repository.
+4. Double-click **Install Resonance.cmd**, or open Command Prompt in the extracted folder and run:
+
+```bat
+resonance.cmd update
+```
+
+Spotify restarts after installation. The same Resonance interface and features are used on both systems, with Windows font fallbacks.
+
+**Check Resonance.cmd**, **Update Resonance.cmd** and **Uninstall Resonance.cmd** provide the corresponding actions. To build the extension without changing Spotify, use **build-extension.cmd** or `py -3 build.py`.
+
+The installer uses the Spotify path from Spicetify’s configuration and reads the actual `Spotify.exe` product version. It does not guess the installed version from an old backup. If the version cannot be read, it stops before changing Spotify. It does not install dependencies, change execution policy, or request administrator access.
+
+### Windows validation
+
+GitHub Actions runs the JS and maintenance suites on Windows and macOS, including a native Windows executable-version check and Windows launcher smoke tests. Tests simulate Spotify’s filesystem and commands; they do not run Spotify playback. **Live Spotify on Windows has not yet been verified.** Spotify service/API compatibility remains dependent on the installed client, account and Spicetify version.
 
 ## Maintenance
 
@@ -76,7 +99,7 @@ Lyrics use Spotify first and LRCLIB when synced Spotify lines are unavailable. T
 
 ## Development and tests
 
-Requires Node.js 18+ for JavaScript tests and Python 3.9+ for maintenance/tests. The macOS command wrappers use zsh and `/usr/bin/python3`.
+Requires Node.js 18+ for JavaScript tests and Python 3.9+ for maintenance/tests. The macOS command wrappers use zsh and `/usr/bin/python3`. Windows `.cmd` launchers use `py -3`, with `python` as a fallback.
 
 ```sh
 ./build-extension.command

@@ -1,6 +1,6 @@
 # Resonance maintenance
 
-Run these from this folder, or double-click the matching `.command` file in Finder.
+On macOS, run these from this folder or double-click the matching `.command` file in Finder. On Windows, use the corresponding `.cmd` file; commands are `resonance.cmd update`, `resonance.cmd check`, and `resonance.cmd uninstall`.
 
 ```sh
 ./resonance.command update
@@ -24,8 +24,8 @@ Preview an action without changing anything:
 
 Check exit codes: 0 = healthy; 1 = needs attention; 2 = command/setup failure. There is no background monitor or scheduled task.
 
-If Spotify changes, run the updater. If Spicetify cannot apply to the new Spotify build, update the existing Homebrew package with `brew upgrade spicetify-cli`, then retry. The script reports failures and leaves its recovery copies available; it does not block Spotify updates or silently download another CLI.
+If Spotify changes, run the updater. If Spicetify cannot apply to the new Spotify build, update Spicetify using the package manager used to install it (on macOS with Homebrew: `brew upgrade spicetify-cli`), then retry. The script reports failures and leaves its recovery copies available; it does not block Spotify updates or silently download another CLI.
 
-Requires the existing Spicetify installation and `/usr/bin/python3` (tested on this Mac with Python 3.9.6). Tests can run with `/usr/bin/python3 tests/test_maintenance.py`.
+Requires an existing Spicetify configuration and Python 3.9+. macOS wrappers use `/usr/bin/python3`; Windows launchers try `py -3` then `python`. Version detection reads the macOS application plist or Windows executable product-version metadata. Tests: `python -m unittest discover -s tests -p test_maintenance.py`. Windows lifecycle tests use simulated Spotify commands; native executable version reading is checked on Windows runners. Live Spotify on Windows has not been verified.
 
 Spicetify workflow reference: https://spicetify.app/docs/getting-started/#updating

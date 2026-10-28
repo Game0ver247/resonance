@@ -1,5 +1,4 @@
 #!/bin/zsh
 set -euo pipefail
-cd "$(dirname "$0")"
-cat lyrics-engine.js display-ui.js > resonanceDisplay.js
-printf 'Built resonanceDisplay.js from lyrics-engine.js and display-ui.js\n'
+project_dir="$(cd "$(dirname "$0")" && pwd)"
+exec /usr/bin/python3 "$project_dir/build.py"

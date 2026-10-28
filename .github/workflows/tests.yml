@@ -1,0 +1,40 @@
+name: Cross-platform checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build extension
+        run: python build.py
+      - name: JavaScript regressions
+        run: npm test
+      - name: Maintenance and native platform checks
+        run: python -m unittest discover -s tests -p test_maintenance.py
+      - name: Verify Windows launchers
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          call build-extension.cmd
+          if errorlevel 1 exit /b 1
+          call resonance.cmd --help
+          if errorlevel 1 exit /b 1
+      - name: Verify bundle is reproducible
+        run: git diff --exit-code -- resonanceDisplay.js
