@@ -20,33 +20,73 @@ An album-focused listening interface inside Spotify desktop, built with Spicetif
 - Reduced-motion support, fullscreen controls, local preference storage and optional diagnostics.
 - Update, uninstall and installation-health commands with recovery backups.
 
-## Install on Fedora / Linux
+## Install
 
-See [the Fedora setup guide](LINUX.md) for Flatpak and native Spotify. After Spotify and Spicetify are configured, open a terminal in this folder and run:
+Resonance runs inside Spotify desktop. Install Spotify, sign in, and finish [Spicetify's platform-specific setup](https://spicetify.app/docs/getting-started) before applying Resonance. Python 3.9+ is required for source installs; Homebrew installs Python automatically. Source commands below also require Git. Downloads are available from [Releases](https://github.com/Game0ver247/resonance/releases).
+
+### macOS — Homebrew
 
 ```sh
-sh resonance.sh update
+brew install Game0ver247/resonance/resonance
+resonance update
 ```
 
-Use `sh resonance.sh check` after a Spotify update, and `sh resonance.sh uninstall` to remove Resonance.
+Homebrew installs Python and Spicetify CLI as dependencies. If this is your first Spicetify installation, complete its setup before running `resonance update`. Installing the formula alone does not modify Spotify.
 
-## Install on macOS
-
-1. Install and sign in to Spotify desktop.
-2. Set up [Spicetify using its official instructions](https://spicetify.app/docs/getting-started). The maintenance commands require an existing Spicetify configuration.
-3. Clone or download this repository, open Terminal in its folder and run:
+Upgrade later:
 
 ```sh
+brew update
+brew upgrade Game0ver247/resonance/resonance
+resonance update
+```
+
+Check or remove the Spotify customization:
+
+```sh
+resonance check
+resonance uninstall
+```
+
+Then `brew uninstall resonance` removes the command itself. Removing the Homebrew package alone does not undo Spotify customization. Recovery backups stay in your Spicetify config directory.
+
+### macOS — source / Terminal
+
+After setting up Spotify, Spicetify and Python:
+
+```sh
+git clone https://github.com/Game0ver247/resonance.git
+cd resonance
 ./resonance.command update
 ```
 
-The updater rebuilds the bundle, registers the extension and applies it. Spotify restarts. Open **Resonance** near the top of Spotify. Click the **resonance** name inside the view for grouped Look & layout, Visualizer, Lyrics and Advanced settings. Escape dismisses settings first, then returns to Spotify.
+### Fedora / Linux — Terminal
 
-The updater is local: it installs the source in this folder, without downloading a newer release. After pulling a repository update, run it again. Double-clickable Update, Check and Uninstall command files are also included.
+Follow [the Linux setup guide](LINUX.md) to configure Flatpak or native Spotify and its permissions. On Fedora, install prerequisites with `sudo dnf install python3 git`. Then:
 
-Manual installation of the generated `resonanceDisplay.js` follows the [Spicetify extension instructions](https://spicetify.app/docs/customization/extensions).
+```sh
+git clone https://github.com/Game0ver247/resonance.git
+cd resonance
+sh resonance.sh update
+```
 
-## Install on Windows
+Use `sh resonance.sh check` or `sh resonance.sh uninstall` for maintenance. No Node.js is required to install. On other Linux distributions, install Python and Git with your package manager first.
+
+### Windows — Terminal
+
+After installing Spotify, Spicetify, Python 3.9+ and Git, run in PowerShell or Command Prompt:
+
+```powershell
+git clone https://github.com/Game0ver247/resonance.git
+cd resonance
+.\resonance.cmd update
+```
+
+Use `.\resonance.cmd check` or `.\resonance.cmd uninstall` for maintenance. If you downloaded a ZIP instead, open a terminal in its extracted folder and run those commands without cloning.
+
+Spotify restarts when changes are applied. Open **Resonance** near the top of Spotify, then click the **resonance** name for settings. Source installs update the files in that folder: run `git pull` before applying an upgrade. Double-clickable Mac and Windows maintenance scripts are also included.
+
+## Windows setup details
 
 1. Install Spotify desktop and sign in. Set up Spicetify using its [official Windows instructions](https://spicetify.app/docs/getting-started). For example, its documented Winget package is `Spicetify.Spicetify`. Reopen Terminal after installing so Spicetify is on PATH.
 2. Install **Python 3.9+** with its launcher or Python on PATH. No other Python packages are needed.

@@ -1,3 +1,8 @@
+# 4.10.1 — Homebrew installation
+
+- Add a packaged launcher that runs maintenance from a temporary writable copy.
+- Document Homebrew and terminal installation for macOS, Windows and Linux.
+
 # 4.10.0 — Fedora / Linux
 
 - Linux entry points for install/update, health checks, uninstall and bundle building.
