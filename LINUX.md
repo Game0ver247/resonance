@@ -2,6 +2,10 @@
 
 Resonance runs inside the Spotify desktop app through Spicetify. This is the same listening interface as the Mac and Windows versions, packaged with Linux maintenance commands. It is not a separate audio player or an RPM.
 
+The 4.16 Linux preview includes search tabs with Spotify result ordering, album-context playback and album drawer, playlist queue, clickable Up Next, missing-lyrics artwork fallback, gradual Mesh rotation, progress-following vinyl tonearm, and reduced idle wakeups/request caching. Mesh effects respect Low power and reduced motion.
+
+Use the `linux-preview/4.16` branch for source updates; main remains on 4.15. The same archive supports configured native Spotify and Flatpak installations. No separate Flatpak build is needed.
+
 ## Set up Spotify and Spicetify
 
 1. Install Python 3.9 or later. On Fedora: `sudo dnf install python3`.
@@ -45,7 +49,16 @@ sh resonance.sh update
 sh resonance.sh uninstall
 ```
 
-`update` installs the source in this folder. Download a newer release or pull Git changes first to upgrade Resonance. Recovery copies live in your Spicetify config directory under `Resonance/backups`. Uninstall preserves your source files and other extensions.
+`update` installs the source in this folder. Download a newer Linux release or pull the Linux preview branch first to upgrade Resonance. From an existing clean Git checkout:
+
+```sh
+git fetch origin
+git switch linux-preview/4.16
+git pull --ff-only
+sh resonance.sh update
+```
+
+Commit or save any local edits before switching branches. Recovery copies live in your Spicetify config directory under `Resonance/backups`. Uninstall preserves your source files and other extensions.
 
 After a Spotify/Flatpak update, update Spicetify if needed, recheck its configured path and write permissions, then run `update` again. The checker detects mismatched Spotify backups, missing injection and file drift; it cannot verify playback APIs or live lyrics.
 

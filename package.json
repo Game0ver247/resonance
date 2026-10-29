@@ -1,6 +1,6 @@
 {
   "name": "resonance-spotify",
-  "version": "4.16.0-mac.5",
+  "version": "4.16.0-linux.1",
   "private": true,
   "description": "Album-focused listening interface for Spotify desktop on macOS, Windows and Linux through Spicetify",
   "scripts": {

@@ -1,8 +1,8 @@
-> **Mac preview:** [4.16.0-mac.5](https://github.com/Game0ver247/resonance/releases/tag/v4.16.0-mac.5) adds search tabs, playlist discovery and missing-lyrics fallback. [Changelog](CHANGELOG.md). This branch is a Mac trial; stable/Homebrew/Windows/Linux remain on 4.15.0. Download the Mac preview and run its Update Resonance.command. Running the stable Homebrew updater will reinstall stable source.
+> **Linux update:** [4.16.0-linux.1](https://github.com/Game0ver247/resonance/releases/tag/v4.16.0-linux.1) brings the latest interface and efficiency improvements to Fedora and other supported Linux installations. [Changelog](CHANGELOG.md). Mac, Windows and Homebrew releases are unchanged.
 
 # Resonance
 
-An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current source revision: **4.15**.
+An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. This branch contains the **4.16 Linux preview**. Stable main/Homebrew remain on 4.15; Mac previews are published separately.
 
 [![Cross-platform checks](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml/badge.svg)](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml)
 
@@ -78,7 +78,7 @@ cd resonance
 Follow [the Linux setup guide](LINUX.md) to configure Flatpak or native Spotify and its permissions. On Fedora, install prerequisites with `sudo dnf install python3 git`. Then:
 
 ```sh
-git clone https://github.com/Game0ver247/resonance.git
+git clone --branch linux-preview/4.16 --single-branch https://github.com/Game0ver247/resonance.git
 cd resonance
 sh resonance.sh update
 ```

@@ -1,3 +1,12 @@
+# 4.16.0-linux.1 — Fedora / Linux update
+
+- Bring Linux packages up to the shared interface from Mac preview 5: category search in Spotify order, selected-album drawer, album-context track playback, playlist queue, missing-lyrics fallback, and optional slow Mesh color rotation.
+- Include the Up Next pointer-input fix and progress-following vinyl tonearm.
+- Include idle-render scheduling and safe negative-result caching; transient provider failures remain retryable. No new runtime dependency or audio-capture permission.
+- Retain Linux native/Flatpak version detection, installer, health checks, backups and uninstall. The transaction lock from the Mac preview remains Mac-specific.
+- Update Linux source commands to use this preview branch. Mac, Windows, main and Homebrew releases are unchanged.
+- Automated verification covers Fedora container and Ubuntu; interactive Linux/Wayland/X11 Spotify testing is still outside the verified scope.
+
 # 4.16.0-mac.5 — Progress-following vinyl tonearm
 
 - Start the tonearm at the outer groove and slowly move inward with song progress.
