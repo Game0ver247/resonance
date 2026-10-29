@@ -15,9 +15,9 @@ async function createUI(){
  const context={localStorage:{getItem:key=>preferences.get(key)??null,setItem:(key,value)=>preferences.set(key,value)},__RESONANCE_TEST__:true,AbortController,URLSearchParams,fetch:async()=>{lyricFetches++;return {ok:false}},document:doc,window:{Spicetify:{Player:player,Platform:{LibraryAPI:{contains:async()=>[saved],add:async arg=>{calls.push(['save',arg]);if(fail)throw Error('offline');saved=true},remove:async arg=>{calls.push(['remove',arg]);if(fail)throw Error('offline');saved=false}}}}},Spicetify:null,WebSocket:WS,matchMedia:()=>({matches:false}),performance:{now:()=>100},requestAnimationFrame:fn=>{frames.push(fn);return frames.length},cancelAnimationFrame(){},setInterval:fn=>{timers.push(fn)},setTimeout:(fn,ms)=>{timeouts.push({fn,ms});return timeouts.length},clearTimeout(){},devicePixelRatio:1,windowPlaceholder:null,console:{info(){}}};
  context.window.addEventListener=()=>{};context.Spicetify=context.window.Spicetify;vm.runInNewContext(bundle,context);
  const get=id=>elements.get('resonance-'+id);
- get('album-panel').hidden=true;get('launch').onclick();await new Promise(setImmediate);
+ get('album-panel').hidden=true;get('queue').hidden=true;get('themes').hidden=true;get('launch').onclick();await new Promise(setImmediate);
 
  return {get,api:context.__RESONANCE_TEST_API__,context,calls,player,preferences,frames,
-  pressKey(key){const event={key,target:{tagName:'BODY'},preventDefault(){},stopPropagation(){}};for(const handler of documentHandlers.get('keydown')||[])handler(event)},setAlbumURI(value){albumRef=value},setURI(value){uri=value},setProgress(value){progress=value},poll(){timers[0]()},saved(){return saved}};
+  pressKey(key){const event={key,target:{tagName:'BODY'},preventDefault(){},stopPropagation(){}};for(const handler of documentHandlers.get('keydown')||[])handler(event)},setQueue(value){queueItems=value},pointerDown(target){for(const handler of documentHandlers.get('pointerdown')||[])handler({target})},setAlbumURI(value){albumRef=value},setURI(value){uri=value},setProgress(value){progress=value},poll(){timers[0]()},saved(){return saved}};
 }
 module.exports={createUI,flush:()=>new Promise(setImmediate)};

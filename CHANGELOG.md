@@ -1,3 +1,10 @@
+# 4.12.0 — Queue controls and outside-click dismissal
+
+- Add queue Refresh and Clear buttons, plus remove controls for individual upcoming entries.
+- Use queue entry IDs to distinguish repeated songs; disable ambiguous removals and unsupported actions.
+- Serialize queue changes and recover controls after failures.
+- Dismiss settings, search, album details and queue panels on outside pointer clicks, preserving focus on the clicked control.
+
 # 4.11.0 — Search and discovery
 
 - Add a compact header search control with debounced native Spotify search, up to six results, keyboard access and full-search fallback.
