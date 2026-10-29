@@ -803,16 +803,20 @@
     if(target&&typeof pane.scrollTo==='function'){const top=target.offsetTop-pane.offsetTop-pane.clientHeight/2+target.offsetHeight/2;scrollLyrics(pane,top,reduced.matches||rebuilt||root.dataset.power==='low');}
   }
   let lyricScroll=0;
-  let scrollbarIdle=0;
-  function hideLyricScrollbar(){clearTimeout(scrollbarIdle);get('expanded-lyrics').dataset.scrolling='false';}
+  let scrollbarIdle=0,scrollbarDragging=false;
+  function hideLyricScrollbar(){scrollbarDragging=false;clearTimeout(scrollbarIdle);get('expanded-lyrics').dataset.scrolling='false';}
   function revealLyricScrollbar(){
     const pane=get('expanded-lyrics');pane.dataset.scrolling='true';clearTimeout(scrollbarIdle);
-    scrollbarIdle=setTimeout(()=>{pane.dataset.scrolling='false';},900);
+    scrollbarIdle=setTimeout(()=>{if(!scrollbarDragging)pane.dataset.scrolling='false';},900);
   }
   const lyricsPane=get('expanded-lyrics');
   lyricsPane.onwheel=lyricsPane.ontouchmove=revealLyricScrollbar;
   lyricsPane.onkeydown=event=>{if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key))revealLyricScrollbar();};
-  lyricsPane.onpointerdown=event=>{if(event.clientX>=lyricsPane.getBoundingClientRect().right-12)revealLyricScrollbar();};
+  lyricsPane.onpointerdown=event=>{if(event.clientX>=lyricsPane.getBoundingClientRect().right-12){scrollbarDragging=true;revealLyricScrollbar();}};
+  lyricsPane.onpointermove=()=>{if(scrollbarDragging)revealLyricScrollbar();};
+  const endScrollbarDrag=()=>{if(scrollbarDragging){scrollbarDragging=false;revealLyricScrollbar();}};
+  lyricsPane.onpointerup=lyricsPane.onpointercancel=endScrollbarDrag;
+  document.addEventListener('pointerup',endScrollbarDrag);
   function scrollLyrics(pane,top,immediate=false){
     cancelAnimationFrame(lyricScroll);
     if(immediate||root.dataset.lyricStyle!=='animated'){pane.scrollTo({top,behavior:immediate?'instant':'smooth'});return;}

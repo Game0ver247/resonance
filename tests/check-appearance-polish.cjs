@@ -13,5 +13,6 @@ const {createUI}=require('./helpers/ui-harness.cjs');
  const pane=get('expanded-lyrics');pane.onscroll?.();assert.notEqual(pane.dataset.scrolling,'true','automatic lyric scroll should not reveal the scrollbar');
  pane.onwheel();assert.equal(pane.dataset.scrolling,'true');ui.timeouts.at(-1).fn();assert.equal(pane.dataset.scrolling,'false');
  pane.onkeydown({key:'PageDown'});assert.equal(pane.dataset.scrolling,'true');ui.timeouts.at(-1).fn();assert.equal(pane.dataset.scrolling,'false');
+ pane.getBoundingClientRect=()=>({right:100});pane.onpointerdown({clientX:98});ui.timeouts.at(-1).fn();assert.equal(pane.dataset.scrolling,'true','dragging the scrollbar must keep its thumb visible');pane.onpointerup();ui.timeouts.at(-1).fn();assert.equal(pane.dataset.scrolling,'false');
  console.log('Passed: vivid album accents, monochrome fallback, minority cover colors, eight mesh splashes and manual-scroll-only scrollbar');
 })().catch(error=>{console.error(error);process.exitCode=1});
