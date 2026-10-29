@@ -18,6 +18,6 @@ async function createUI(){
  get('album-panel').hidden=true;get('queue').hidden=true;get('themes').hidden=true;get('launch').onclick();await new Promise(setImmediate);
 
  return {get,api:context.__RESONANCE_TEST_API__,context,calls,player,preferences,frames,
-  pressKey(key){const event={key,target:{tagName:'BODY'},preventDefault(){},stopPropagation(){}};for(const handler of documentHandlers.get('keydown')||[])handler(event)},setQueue(value){queueItems=value},pointerDown(target){for(const handler of documentHandlers.get('pointerdown')||[])handler({target})},setAlbumURI(value){albumRef=value},setURI(value){uri=value},setProgress(value){progress=value},poll(){timers[0]()},saved(){return saved}};
+  pressKey(key){const event={key,target:{tagName:'BODY'},preventDefault(){},stopPropagation(){}};for(const handler of documentHandlers.get('keydown')||[])handler(event)},setPaused(value){paused=value;player.origin._state.isPaused=value},setPageHidden(value){doc.hidden=value;for(const handler of documentHandlers.get('visibilitychange')||[])handler({})},setQueue(value){queueItems=value},pointerDown(target){for(const handler of documentHandlers.get('pointerdown')||[])handler({target})},setAlbumURI(value){albumRef=value},setURI(value){uri=value},setProgress(value){progress=value},poll(){timers[0]()},saved(){return saved}};
 }
 module.exports={createUI,flush:()=>new Promise(setImmediate)};

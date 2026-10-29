@@ -1,3 +1,12 @@
+# 4.13.0 — Lower rendering load and expanding search
+
+- Cap active rendering near 30 fps, cache canvas sizing, bound waveform samples and reuse geometry across lines.
+- Reuse unchanged paused frames and suspend hidden-page rendering/polling; localize beat-pulse styles to the artwork rather than the whole view.
+- Make mesh drift transform-only, pause unused/paused background motion and remove full-window backdrop blur.
+- Add Advanced → Power usage → Low power to stop expensive visual effects while preserving lyrics and controls.
+- Fetch larger ranked search windows on scroll, deduplicate entries and stop at 60 preview results. Keep More results as a keyboard-accessible alternative.
+- Make album result rows and the current album name open the album page.
+
 # 4.12.0 — Queue controls and outside-click dismissal
 
 - Add queue Refresh and Clear buttons, plus remove controls for individual upcoming entries.

@@ -1,6 +1,6 @@
 # Resonance
 
-An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current source revision: **4.12**.
+An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current source revision: **4.13**.
 
 [![Cross-platform checks](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml/badge.svg)](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml)
 
@@ -18,9 +18,18 @@ An album-focused listening interface inside Spotify desktop, built with Spicetif
 - Waves, Ribbon, Bars and Dots; Calm, Tight, Flow and Punch motion presets.
 - Album details, playable tracklists with Add to queue, clickable artist names, credits and available sourced album background information.
 - Click outside settings, search, album details or the queue to dismiss the panel.
-- Compact expandable search with up to six song, artist and album results; play songs, open artist/album pages or add songs to the queue.
+- Compact expandable search: six results initially, more fetched as you scroll (up to 60 ranked preview results). Play songs, open artist/album pages or add songs to the queue.
+- Balanced rendering capped near 30 fps, paused-frame reuse, hidden-page suspension and a Low power option under Advanced.
 - Reduced-motion support, fullscreen controls, local preference storage and optional diagnostics.
 - Update, uninstall and installation-health commands with recovery backups.
+
+## Power usage
+
+Under **resonance → Advanced → Power usage**, choose **Low power** to pause mesh movement and vinyl rotation, hide the visualizer and beat glow, and disable animated lyric blur/transitions. Lyrics, search and playback controls remain available. Switching back to Balanced restores your selected appearance settings.
+
+Balanced keeps the visualizer near 30 fps, reuses unchanged paused frames, limits canvas pixel density and samples, and suspends rendering/polling while the page is hidden. Mesh motion uses transforms rather than animating large gradient positions. Expensive full-window backdrop blur has been removed.
+
+The heaviest optional visuals are the moving mesh background, waveform rendering (especially Punch glow), vinyl rotation and animated lyric effects. Choose **Dark** or **Accent** backgrounds, **Cover** artwork and **Visualizer Off** to reduce individual effects without enabling Low power. Spotify can also consume CPU outside Resonance; these changes do not guarantee a particular total CPU load or temperature.
 
 ## Install
 
