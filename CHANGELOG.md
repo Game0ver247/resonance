@@ -1,5 +1,6 @@
-# 4.14.1 — Quiet lyrics scrollbar
+# 4.14.1 — Quiet scrollbar and consistent instrumental notes
 
+- Use matching inline music-note indicators for all instrumental rows and remove the duplicate floating notes.
 - Hide the lyrics scrollbar thumb until the pane is hovered, focused or actively used.
 - Keep scrollbar width stable to avoid shifting the artwork/lyrics layout; use CSS only, without polling or animation loops.
 
