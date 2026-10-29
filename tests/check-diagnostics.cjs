@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');const {createUI}=require('./helpers/ui-harness.cjs');
+(async()=>{const ui=await createUI(),{api,get,context}=ui;
+ assert.equal(typeof api.captureDiagnostics,'function','Advanced must collect a shareable local report');
+ api.recordDiagnostic('test','failed',{message:'Bearer SECRET cookie=COOKIE https://host/private?token=SECRET spotify:track:PRIVATE',stack:'at load (https://xpui.app.spotify.com/extensions/resonanceDisplay.js:123:4)'});
+ for(let i=0;i<60;i++)api.recordDiagnostic('bounded','event');
+ let report=api.captureDiagnostics();assert(report.recentEvents.length<=40);assert.equal(report.playback.wrapperHasItem,true);assert.equal(report.lyrics.lineCount>=0,true);assert(report.settings);assert(!JSON.stringify(report).includes('SECRET'));assert(!JSON.stringify(report).includes('COOKIE'));
+ api.recordDiagnostic('test','failure',{message:'failed at https://host/path?token=SECRET spotify:track:PRIVATE',stack:'at fn (https://host/extensions/resonanceDisplay.js:123:4)'});
+ report=api.captureDiagnostics();assert.equal(report.recentEvents.at(-1).where,'resonanceDisplay.js:123:4');assert(!JSON.stringify(report).includes('PRIVATE'));assert(!JSON.stringify(report).includes('Test'));assert(!JSON.stringify(report).includes('Artist'));
+ assert.equal(typeof get('diagnostics-save').onclick,'function');assert.equal(typeof get('diagnostics-copy').onclick,'function');
+ let copied='';context.Spicetify.Platform.ClipboardAPI={copy:async value=>{copied=value}};await get('diagnostics-copy').onclick();assert.equal(JSON.parse(copied).format,'resonance-diagnostics-v1');
+ console.log('Passed: diagnostics snapshot, bounded events, safe stack location and secret/entity redaction');
+})().catch(e=>{console.error(e);process.exitCode=1});

@@ -1,3 +1,14 @@
+# 4.17.0-preview.1 — Genuine word/syllable lyrics and local diagnostics
+
+Preview only: stable main/Homebrew remain on 4.16.1.
+
+- Add validated Better Lyrics TTML syllable/word timing, then LRCLIB Lyricsfile word timing; retain Spotify/LRCLIB line lyrics when unavailable. Do not estimate token timing.
+- Add Lyrics → Word highlighting Auto/Off, Retry lyrics, active-line token sweep, pause/seek/offset support and visible Word sync/Line sync labels. Keep provider translations and ordinary keyword emphasis on line-only rows.
+- Request recording title/artist/album/duration, conservatively compare fine timing with the line baseline, cancel stale requests, cache results and honor provider cooldowns. Better Lyrics uses Spicetify's configured public HTTPS proxy without Spotify authorization.
+- Bundle js-yaml 4.1.1 with its MIT license inside the lyric engine to safely read bounded Lyricsfile input; no runtime dependency installation.
+- Add Advanced → Capture diagnostics (local JSON download) and Copy diagnostics. Include bounded/redacted events, provider failures, playback-state availability, settings and rendering/lyric/analysis counts. No automatic upload, tokens, account details, song IDs or lyric text.
+- See [preview test instructions](docs/testing/word-sync-preview.md) for coverage, limitations and Linux bug-report steps.
+
 # 4.16.1 — Recover missing playback metadata
 
 - Fall back to Spotify PlayerAPI's synchronous current state when Spicetify's wrapper has no current item. Share that state for title/artwork, lyrics, position/duration, source and playback status.

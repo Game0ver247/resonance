@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');const {createUI}=require('./helpers/ui-harness.cjs');
+(async()=>{const ui=await createUI(),{api,get,context}=ui;ui.setURI('spotify:track:TIMED');
+ const rows=[{text:'Hello world',start:1000,end:4000,words:[{text:'Hello ',start:1000,end:2000},{text:'world',start:2500,end:4000}]}];
+ context.Spicetify.CosmosAsync={get:async()=>({lyrics:{syncType:'LINE_SYNCED',lines:[{words:'Hello world',startTimeMs:'1000',endTimeMs:'4000'}]}})};
+ context.ResonanceLyrics.ttml=()=>rows;
+ context.fetch=async url=>({ok:true,status:200,json:async()=>url.includes('betterlyrics')?{ttml:'<tt/>',score:.99}:{}});
+ await api.loadLyrics({title:'Test',artist_name:'Artist',album_title:'Album'},180000);ui.setProgress(1500);api.drawLyrics();
+ const words=get('lyric-line').children.filter(n=>n.className==='resonance-timed-word');assert.equal(words.length,2,'genuine timing creates token spans');assert.equal(words[0].style['--word-progress'],'50%');assert.equal(words[1].style['--word-progress'],'0%');
+ ui.setProgress(3000);api.drawLyrics();assert.equal(words[0].style['--word-progress'],'100%');assert.equal(words[1].style['--word-progress'],'33%');
+ ui.setProgress(1000);api.drawLyrics();assert.equal(words[0].style['--word-progress'],'0%','backwards seeking resets the active word');assert.match(get('lyric-note').textContent,/Word sync/);
+ console.log('Passed: provider enrichment, active-token sweep and seek synchronization');
+})().catch(e=>{console.error(e);process.exitCode=1});

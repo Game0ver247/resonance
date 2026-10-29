@@ -1,3 +1,5 @@
+> **Word-sync preview:** [4.17.0-preview.1](https://github.com/Game0ver247/resonance/releases/tag/v4.17.0-preview.1) adds genuine fine-timed lyrics and local diagnostic reports. [Testing guide](docs/testing/word-sync-preview.md). This branch is experimental; stable main/Homebrew remain 4.16.1.
+
 # Resonance
 
 An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current release: **4.16.1**, available for macOS, Windows and Linux (including Fedora). [Changelog](CHANGELOG.md).
