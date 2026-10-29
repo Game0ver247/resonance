@@ -1,3 +1,4 @@
+window.__RESONANCE_TEST__=true; // Isolated fixture only: expose deterministic visual test controls.
 const cover='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><rect width="600" height="600" fill="#17312e"/><circle cx="355" cy="260" r="160" fill="#d59ca7"/><path d="M0 470 600 190V600H0" fill="#566e6b"/></svg>');
 const lines=Array.from({length:30},(_,i)=>({startTimeMs:String(i*8000),words:['The evening settles softly around us','We find a quiet place to breathe','A little light stays with the room','Every passing moment feels like home'][i%4]}));
 const item={uri:'spotify:track:FIXTURE',metadata:{title:'Velvet Hours — a long title to check the layout',artist_name:'Demo artist, Guest artist',album_title:'Evening Study',image_xlarge_url:cover}};

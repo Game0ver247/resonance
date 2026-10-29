@@ -1,6 +1,6 @@
 # Resonance
 
-An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current source revision: **4.14**.
+An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current source revision: **4.15**.
 
 [![Cross-platform checks](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml/badge.svg)](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml)
 
@@ -13,12 +13,12 @@ An album-focused listening interface inside Spotify desktop, built with Spicetif
 - Synced single-line and scrolling lyrics, click-to-seek, optional translations and per-song timing adjustments.
 - Album-colored keyword emphasis, automatic lyric contrast and animated musical-note interludes.
 - Cover or BPM-driven vinyl artwork, coasting pause animation and optional beat pulse.
-- Dark, Artwork, animated album-color Mesh and static Accent backgrounds.
-- Five accent colors or automatic album-matching accent.
+- Opaque Dark, Artwork, animated album-color Mesh and static Accent backgrounds; Mesh uses up to eight distinct cover-color splashes.
+- Five accent colors or vivid album-matching accents, with a colorful fallback for monochrome covers.
 - Waves, Ribbon, Bars and Dots; Calm, Tight, Flow and Punch motion presets.
 - Album details, playable tracklists with Add to queue, clickable artist names, credits and available sourced album background information.
 - Click outside settings, search, album details or the queue to dismiss the panel.
-- Compact expandable search: six results initially, more fetched as you scroll (up to 60 ranked preview results). Play songs, open artist/album pages or add songs to the queue.
+- Compact expandable search: six results initially, more fetched as you scroll (up to 60 ranked preview results). Play songs, open artist pages, play full albums or add songs to the queue.
 - Balanced rendering capped near 30 fps, paused-frame reuse, hidden-page suspension and a Low power option under Advanced.
 - Reduced-motion support, fullscreen controls, local preference storage and optional diagnostics.
 - Update, uninstall and installation-health commands with recovery backups.

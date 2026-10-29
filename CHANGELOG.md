@@ -1,3 +1,12 @@
+# 4.15.0 — Richer colors, opaque backgrounds and album playback
+
+- Reveal the lyrics scrollbar only during manual wheel, touch or keyboard scrolling; hide it after a short idle delay. Hover and automatic lyric movement leave it hidden.
+- Make the root background fully opaque to prevent Spotify UI showing through Artwork or Mesh.
+- Use chromatic album accents with stronger saturation, and a vivid blue fallback for monochrome covers.
+- Retain the dominant cover tone plus smaller distinct colorful details in an up-to-eight-color palette; place visible gradient splashes across the mesh.
+- Play the full album context when clicking album names in song details, the bottom summary, Album details or search.
+- Keep mesh motion transform-only and preserve Low power behavior.
+
 # 4.14.1 — Quiet scrollbar and consistent instrumental notes
 
 - Use matching inline music-note indicators for all instrumental rows and remove the duplicate floating notes.
