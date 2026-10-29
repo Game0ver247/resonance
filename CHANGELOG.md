@@ -1,3 +1,10 @@
+# 4.16.0-mac.5 — Progress-following vinyl tonearm
+
+- Start the tonearm at the outer groove and slowly move inward with song progress.
+- Keep the arm in place when paused, follow seeks, and reset for the next track. Unknown duration uses the outer groove.
+- Reuse the existing metadata update cycle, cache unchanged transforms and use a short linear CSS transition. No new timer or animation loop; reduced motion disables the transition.
+- Mac preview only; stable/Homebrew/Windows/Linux unchanged.
+
 # 4.16.0-mac.4 — Clickable Up Next in lyrics view
 
 - Put the Up Next button above the scrolling lyrics pane so pointer clicks reach it instead of seeking a lyric underneath.

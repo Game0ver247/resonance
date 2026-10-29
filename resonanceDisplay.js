@@ -46,7 +46,7 @@
 
 // NAME: Resonance Display
 // AUTHOR: Local customization
-// VERSION: 4.16.0-mac.4
+// VERSION: 4.16.0-mac.5
 // DESCRIPTION: Album-focused Spotify listening view with synced lyrics, track-analysis visuals and playback controls.
 (() => {
   if (document.getElementById('resonance-launch')) return;
@@ -211,10 +211,9 @@
   #resonance-grooves,#resonance-spindle,#resonance-tonearm {display:none;pointer-events:none}
   #resonance-root[data-artwork="vinyl"] #resonance-grooves {display:block;position:absolute;inset:3%;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 3px,#ffffff09 3.5px 4px);mask-image:radial-gradient(circle,transparent 32%,#000 33%)}
   #resonance-root[data-artwork="vinyl"] #resonance-spindle {display:block;position:absolute;left:49%;top:49%;width:2%;height:2%;border-radius:50%;background:#111;box-shadow:0 0 0 2px #ffffff50}
-  #resonance-root[data-artwork="vinyl"] #resonance-tonearm {display:block;position:absolute;right:-1%;top:0;width:6px;height:65%;background:linear-gradient(90deg,#666,#ccc,#777);border-radius:4px;transform-origin:50% 4%;transform:rotate(-8deg);transition:transform 1.5s cubic-bezier(.22,1,.36,1);box-shadow:3px 3px 8px #0007}
+  #resonance-root[data-artwork="vinyl"] #resonance-tonearm {display:block;position:absolute;right:-1%;top:0;width:6px;height:65%;background:linear-gradient(90deg,#666,#ccc,#777);border-radius:4px;transform-origin:50% 4%;transform:rotate(8deg);transition:transform .6s linear;box-shadow:3px 3px 8px #0007}
   #resonance-tonearm::before {content:'';position:absolute;top:-3px;left:-5px;width:16px;height:16px;border-radius:50%;background:#777;box-shadow:0 0 0 4px #252929}
   #resonance-tonearm::after {content:'';position:absolute;bottom:-8px;left:-3px;width:13px;height:28px;background:#a7aaa7;border-radius:3px;transform:rotate(-16deg)}
-  #resonance-root[data-artwork="vinyl"][data-playing="true"] #resonance-tonearm {transform:rotate(24deg)}
   #resonance-grain {position:absolute;inset:0;pointer-events:none;opacity:0;mix-blend-mode:soft-light;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='white' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E")}
   #resonance-root[data-artwork="vinyl"] #resonance-grain {opacity:.13}
   #resonance-root[data-lyric-style="animated"] #resonance-expanded-lines button {filter:blur(.9px);opacity:.65;transition:filter .6s,opacity .6s,color .6s,transform .65s}
@@ -1419,6 +1418,11 @@
     cover.onerror=()=>{if(generation!==artworkGeneration)return;cover.style.opacity='0';};cover.src=image;
     if(cover.complete&&cover.naturalWidth>0)cover.onload();
   }
+  let tonearmTransform='';
+  function renderTonearm(position,duration){
+    const transform=root.dataset.artwork==='vinyl'?'rotate('+Number((8+20*clamp01(duration>0?position/duration:0)).toFixed(3))+'deg)':'';
+    if(transform!==tonearmTransform){get('tonearm').style.transform=transform;tonearmTransform=transform;}
+  }
   function update() {
     if(root.hidden||document.hidden) return;
     syncLyricsVisibility();if(needsAnalysis())loadAnalysis();
@@ -1448,7 +1452,7 @@
     if(seekingURI&&seekingURI!==currentURI()){seekCanceled=true;seekingURI='';}
     get('track').max=String(Math.max(1,duration));get('track').disabled=!(duration>0)||!currentURI();
     if(!seekingURI)paintPosition(progress,duration);
-    renderUpNext(progress,duration);
+    renderUpNext(progress,duration);renderTonearm(progress,duration);
     text('duration',native('[data-testid="playback-duration"]')?.textContent || fmt(duration));
     if(root.dataset.lyricStyle!=='off')loadLyrics(meta,duration);
 
