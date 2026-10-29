@@ -1,6 +1,6 @@
 // NAME: Resonance Display
 // AUTHOR: Local customization
-// VERSION: 4.14
+// VERSION: 4.14.1
 // DESCRIPTION: Album-focused Spotify listening view with synced lyrics, track-analysis visuals and playback controls.
 (() => {
   if (document.getElementById('resonance-launch')) return;
@@ -336,6 +336,14 @@
     #resonance-root[data-layout="karaoke"] #resonance-expanded-lines button {font-size:clamp(22px,3vw,36px)}
   }
 `;
+  css.textContent+=`
+  #resonance-root #resonance-expanded-lyrics {scrollbar-width:thin;scrollbar-color:transparent transparent}
+  #resonance-root #resonance-expanded-lyrics:is(:hover,:focus-within,:active) {scrollbar-color:#ffffff45 transparent}
+  #resonance-expanded-lyrics::-webkit-scrollbar {width:6px;background:transparent}
+  #resonance-expanded-lyrics::-webkit-scrollbar-thumb {background:transparent;border-radius:6px}
+  #resonance-expanded-lyrics:is(:hover,:focus-within,:active)::-webkit-scrollbar-thumb {background:#ffffff45}
+  #resonance-expanded-lyrics::-webkit-scrollbar-thumb:hover {background:#ffffff75}
+  `;
   document.head.append(css);
   const launch = document.createElement('button');
   launch.id = 'resonance-launch'; launch.textContent = 'Resonance'; launch.title = 'Open artwork-focused listening view';

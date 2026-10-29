@@ -1,3 +1,8 @@
+# 4.14.1 — Quiet lyrics scrollbar
+
+- Hide the lyrics scrollbar thumb until the pane is hovered, focused or actively used.
+- Keep scrollbar width stable to avoid shifting the artwork/lyrics layout; use CSS only, without polling or animation loops.
+
 # 4.14.0 — Lyrics + artwork layout
 
 - Replace Karaoke with a combined artwork-and-scrolling-lyrics view.
