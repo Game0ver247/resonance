@@ -1,6 +1,6 @@
 # Resonance
 
-An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current source revision: **4.10**.
+An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current source revision: **4.11**.
 
 [![Cross-platform checks](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml/badge.svg)](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml)
 
@@ -16,7 +16,8 @@ An album-focused listening interface inside Spotify desktop, built with Spicetif
 - Dark, Artwork, animated album-color Mesh and static Accent backgrounds.
 - Five accent colors or automatic album-matching accent.
 - Waves, Ribbon, Bars and Dots; Calm, Tight, Flow and Punch motion presets.
-- Album details, tracklists, credits and available sourced album background information.
+- Album details, playable tracklists with Add to queue, clickable artist names, credits and available sourced album background information.
+- Compact expandable search with up to six song, artist and album results; play songs, open artist/album pages or add songs to the queue.
 - Reduced-motion support, fullscreen controls, local preference storage and optional diagnostics.
 - Update, uninstall and installation-health commands with recovery backups.
 

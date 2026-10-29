@@ -1,3 +1,10 @@
+# 4.11.0 — Search and discovery
+
+- Add a compact header search control with debounced native Spotify search, up to six results, keyboard access and full-search fallback.
+- Play songs and add them to the queue from search results and album tracklists.
+- Link credited artist names to their Spotify pages, with name-search fallback when an artist URI is missing.
+- Guard against late search responses after another query or closing the panel; show recoverable playback/queue/search errors.
+
 # 4.10.1 — Homebrew installation
 
 - Add a packaged launcher that runs maintenance from a temporary writable copy.

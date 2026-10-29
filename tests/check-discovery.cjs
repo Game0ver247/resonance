@@ -1,0 +1,53 @@
+const assert=require('node:assert/strict');
+const {createUI}=require('./helpers/ui-harness.cjs');
+function descendants(node){return [node,...(node.children||[]).flatMap(descendants)];}
+(async()=>{
+ const ui=await createUI(),{api,context,get,calls}=ui;
+ context.Spicetify.Player.playUri=async uri=>calls.push(['play',uri]);
+ context.Spicetify.addToQueue=async items=>calls.push(['queue',items]);
+ context.Spicetify.Platform.History={push:route=>calls.push(['route',route])};
+ await api.playTrack('spotify:track:ALBUMSONG');
+ assert.equal(calls.at(-1)[1],'spotify:track:ALBUMSONG');
+ const button=api.addQueueButton({uri:'spotify:track:ALBUMSONG',name:'Album song'});
+ await button.onclick();
+ assert.equal(calls.at(-1)[0],'queue');assert.equal(calls.at(-1)[1][0].uri,'spotify:track:ALBUMSONG');
+ assert.equal(button.disabled,false);
+ context.Spicetify.addToQueue=async()=>{throw Error('offline')};
+ await button.onclick();assert.equal(button.disabled,false);assert.match(get('status').textContent,/queue/i);
+ ui.setAlbumURI('spotify:album:TESTALBUM');
+ context.Spicetify.CosmosAsync={get:async url=>url.includes('/albums/')?{name:'Test album',uri:'spotify:album:TESTALBUM',artists:[{name:'Album artist',uri:'spotify:artist:ALBUMARTIST'}],tracks:{items:[{name:'Album song',uri:'spotify:track:ALBUMSONG',duration_ms:120000}]}}:{}};
+ api.toggleAlbumDetails();await new Promise(setImmediate);await new Promise(setImmediate);
+ let albumNodes=descendants(get('album-panel-content'));
+ const albumSong=albumNodes.find(n=>n.tag==='button'&&n.textContent==='Album song');
+ assert(albumSong,'album songs must be clickable');await albumSong.onclick();assert.equal(calls.at(-1)[1],'spotify:track:ALBUMSONG');
+ assert(albumNodes.some(n=>n.attributes['aria-label']==='Add Album song to queue'));
+ assert(albumNodes.some(n=>n.tag==='button'&&n.textContent==='Album artist'));
+ api.openEntity('spotify:artist:ARTIST');assert.equal(calls.at(-1)[1],'/artist/ARTIST');
+ assert.equal(get('root').hidden,true);get('launch').onclick();
+ const artistLinks=api.artistEntities({artists:[{name:'Main',uri:'spotify:artist:MAIN'},{name:'Guest',uri:'spotify:artist:GUEST'}]});
+ assert.equal(artistLinks.length,2);assert.equal(artistLinks[1].uri,'spotify:artist:GUEST');
+ let oldResolve;
+ context.Spicetify.CosmosAsync={get:async url=>{
+  if(url.includes('q=old'))return new Promise(resolve=>{oldResolve=resolve});
+  return {tracks:{items:[{uri:'spotify:track:NEW',name:'Newest',artists:[{name:'Artist'}]}]},artists:{items:[{uri:'spotify:artist:FOUND',name:'Found artist'}]}};
+ }};
+ api.toggleSearch(true);get('search-input').value='old';const old=api.runSearch('old');
+ get('search-input').value='new';await api.runSearch('new');
+ oldResolve({tracks:{items:[{uri:'spotify:track:OLD',name:'Old result'}]}});await old;
+ let nodes=descendants(get('search-results'));
+ assert(nodes.some(n=>n.textContent==='Newest'));assert(!nodes.some(n=>n.textContent==='Old result'));
+ assert(nodes.some(n=>n.attributes['aria-label']==='Add Newest to queue'));
+ await nodes.find(n=>n.textContent==='Newest').onclick();assert.equal(calls.at(-1)[1],'spotify:track:NEW');
+ get('search-input').value='pending';context.Spicetify.CosmosAsync.get=()=>new Promise(resolve=>{oldResolve=resolve});
+ const pending=api.runSearch('pending');api.toggleSearch(false);oldResolve({tracks:{items:[{uri:'spotify:track:LATE',name:'Late'}]}});await pending;
+ assert.equal(get('search-panel').hidden,true);assert.equal(get('search-results').children.length,0);
+ api.toggleSearch(true);ui.pressKey('Escape');assert.equal(get('search-panel').hidden,true);assert.equal(get('root').hidden,false);
+ context.Spicetify.CosmosAsync.get=async()=>{throw Error('unavailable')};get('search-input').value='error';api.toggleSearch(true);await api.runSearch('error');assert.match(get('search-status').textContent,/Spotify search/i);
+ const graphResults=api.normalizeSearch({data:{searchV2:{topResultsV2:{itemsV2:[{item:{data:{uri:'spotify:artist:GRAPHARTIST',profile:{name:'Graph artist'}}}},{item:{data:{uri:'spotify:track:GRAPHSONG',name:'Graph song',artists:{items:[{profile:{name:'Graph artist'}}]}}}}]}}}});
+ assert.equal(graphResults.length,2);assert.equal(graphResults[1].subtitle,'Graph artist');
+ context.Spicetify.GraphQL={Definitions:{searchModalResults:{name:'searchModalResults'}},Request:async(def,vars)=>{
+  assert.equal(vars.searchTerm,'native');return {data:{searchV2:{topResultsV2:{itemsV2:[{item:{data:{uri:'spotify:track:NATIVE',name:'Native song'}}}]}}}};
+ }};
+ get('search-input').value='native';await api.runSearch('native');assert(descendants(get('search-results')).some(n=>n.textContent==='Native song'));
+ console.log('Passed: track playback, queue success/retry, artist navigation, search result actions, stale search/close guards, Escape and search errors');
+})().catch(error=>{console.error(error);process.exitCode=1});

@@ -18,6 +18,6 @@ async function createUI(){
  get('album-panel').hidden=true;get('launch').onclick();await new Promise(setImmediate);
 
  return {get,api:context.__RESONANCE_TEST_API__,context,calls,player,preferences,frames,
-  pressKey(key){const event={key,target:{tagName:'BODY'},preventDefault(){},stopPropagation(){}};for(const handler of documentHandlers.get('keydown')||[])handler(event)},setURI(value){uri=value},setProgress(value){progress=value},poll(){timers[0]()},saved(){return saved}};
+  pressKey(key){const event={key,target:{tagName:'BODY'},preventDefault(){},stopPropagation(){}};for(const handler of documentHandlers.get('keydown')||[])handler(event)},setAlbumURI(value){albumRef=value},setURI(value){uri=value},setProgress(value){progress=value},poll(){timers[0]()},saved(){return saved}};
 }
 module.exports={createUI,flush:()=>new Promise(setImmediate)};
