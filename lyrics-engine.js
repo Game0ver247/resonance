@@ -69,7 +69,7 @@ return module.exports;})();
     return finalize(rows,duration).filter(row=>row.start<duration&&row.end<=duration+1000).slice(0,1500).map(row=>{
       const words=Array.isArray(row.words)?row.words.slice(0,400):[];
       let previous=row.start;
-      const valid=words.length&&words.every(word=>{const ok=typeof word.text==='string'&&word.text.length<1000&&Number.isFinite(word.start)&&Number.isFinite(word.end)&&word.start>=row.start&&word.start>=previous&&word.end>word.start&&word.end<=row.end;previous=word.end;return ok;})&&compact(words.map(w=>w.text).join(''))===compact(row.text);
+      const valid=words.length&&(words.length>1||!(/\s/.test(row.text.trim())))&&words.every(word=>{const ok=typeof word.text==='string'&&word.text.length<1000&&Number.isFinite(word.start)&&Number.isFinite(word.end)&&word.start>=row.start&&word.start>=previous&&word.end>word.start&&word.end<=row.end;previous=word.end;return ok;})&&compact(words.map(w=>w.text).join(''))===compact(row.text);
       return {...row,words:valid?words:[]};
     });
   }
