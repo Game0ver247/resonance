@@ -1,3 +1,20 @@
+# 4.16.0-mac.1 — Mac preview: discovery and lyric fallback
+
+This preview is for macOS. Stable main, Homebrew, Windows and Linux remain on 4.15.0 until the Mac changes have been tried.
+
+- Temporarily show artwork and song details when synced lyrics are unavailable, with a clear message. Restore the preferred lyrics layout when a track supplies lyrics; preserve the saved preference.
+- Add Songs, Albums and Playlists search tabs. Fetch only the selected category, debounce typing, deduplicate results and cap previews at 60 items.
+- Prefer relevant Spotify-owned mixes/playlists and current-user playlists within the returned search window. Use other creators when no preferred result is present. This is bounded search, not a complete library scan.
+- Artist names in song details, the bottom summary and Album details now search inside Resonance. Playlist names play their playlist context; album names still play albums.
+- Skip lyric requests when Lyrics is Off. Skip track-analysis requests when no enabled visual feature consumes them, and avoid detailed extraction while paused unless debugging.
+- Add deadlines to library, shuffle, repeat, queue and playback requests so stalled Spotify promises release controls. Timeout messages distinguish unconfirmed actions from success; they do not automatically retry mutations.
+- Prevent overlapping Mac update/uninstall transactions with an advisory lock.
+- Consolidate context playback and category result normalization. Retain existing rendering limits and Low power behavior; add no animation loops or dependencies.
+
+Search relies on Spotify internal APIs. Category definitions are lazily discovered from the installed local search route without executing its source. Native definitions take priority, with modal/Web API fallbacks; Spotify changes can still affect discovery. Only ownership from returned metadata is used—third-party playlists cannot be certified as official by their names.
+
+See [code review and validation](docs/reviews/2026-10-28-mac-preview.md).
+
 # 4.15.0 — Richer colors, opaque backgrounds and album playback
 
 - Reveal the lyrics scrollbar only during manual wheel, touch or keyboard scrolling; hide it after a short idle delay. Hover and automatic lyric movement leave it hidden.

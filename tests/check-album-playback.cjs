@@ -9,7 +9,7 @@ const all=node=>[node,...node.children.flatMap(all)];
  context.Spicetify.CosmosAsync={get:async()=>({name:'Current album',uri:'spotify:album:CURRENT',artists:[],tracks:{items:[]}})};
  api.toggleAlbumDetails();await flush();await flush();const heading=all(get('album-panel-content')).find(node=>node.className==='resonance-album-title-play');assert(heading);await heading.onclick();assert.deepEqual(calls.at(-1),['play','spotify:album:CURRENT']);
  await all(get('album-panel-content')).find(node=>node.id==='resonance-album-open').onclick();assert.deepEqual(calls.at(-1),['play','spotify:album:CURRENT']);
- api.toggleSearch(true);context.Spicetify.CosmosAsync.get=async()=>({albums:{items:[{uri:'spotify:album:SEARCHED',name:'Searched album'}]}});get('search-input').value='searched';await api.runSearch('searched');
+ api.toggleSearch(true);context.Spicetify.CosmosAsync.get=async()=>({albums:{items:[{uri:'spotify:album:SEARCHED',name:'Searched album'}]}});get('search-input').value='searched';await api.setSearchCategory('album');
  const result=all(get('search-results')).find(node=>node.className==='resonance-result-name');await result.onclick();assert.deepEqual(calls.at(-1),['play','spotify:album:SEARCHED']);
  assert(!calls.some(call=>call[0]==='navigate'),'album clicks should play the album context, not navigate');
  context.Spicetify.Player.playUri=async()=>{throw Error('offline')};await api.playAlbum('spotify:album:FAIL');assert.match(get('status').textContent,/album/);

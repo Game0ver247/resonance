@@ -1,7 +1,9 @@
 const assert=require('node:assert/strict');
 const {createUI}=require('./helpers/ui-harness.cjs');
 (async()=>{
- const {get,api,preferences}=await createUI();
+ const {get,api,preferences,context}=await createUI();
+ context.Spicetify.CosmosAsync={get:async()=>({lyrics:{syncType:'LINE_SYNCED',lines:[{startTimeMs:'0',words:'Available lyrics'}]}})};
+ await api.loadLyrics({title:'Available'},180000);
  assert(get('layout-options').children.some(button=>button.textContent==='Lyrics + artwork'));
  api.setLayout('karaoke'); // Preserve saved layout preferences from earlier releases.
  assert.equal(get('expanded-lyrics').hidden,false);assert.equal(get('song-summary').hidden,false);

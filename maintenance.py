@@ -3,6 +3,7 @@
 import argparse
 import configparser
 from datetime import datetime, timezone
+from functools import wraps
 import hashlib
 import json
 from pathlib import Path
@@ -15,6 +16,27 @@ import sys
 from build import build_bundle
 
 EXTENSION = 'resonanceDisplay.js'
+
+
+
+def mac_maintenance_transaction(action):
+    """Serialize Mac mutations across Finder, source and Homebrew invocations."""
+    @wraps(action)
+    def locked(self, dry_run=False):
+        if sys.platform != 'darwin' or dry_run:
+            return action(self, dry_run=dry_run)
+        import fcntl
+        lock_path = self.config_dir / 'Resonance' / 'maintenance.lock'
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        # Keep the file: unlinking it would let another process lock a new inode.
+        # Closing releases the advisory lock on success, errors, or process exit.
+        with lock_path.open('a') as owner:
+            try:
+                fcntl.flock(owner, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                raise RuntimeError('Resonance maintenance is already running. Wait for it to finish and retry.') from None
+            return action(self, dry_run=dry_run)
+    return locked
 
 
 def read_config(path):
@@ -203,6 +225,7 @@ class Resonance:
         temporary.write_text(json.dumps(values, indent=2) + '\n', encoding='utf-8')
         temporary.replace(self.state_path)
 
+    @mac_maintenance_transaction
     def update(self, dry_run=False):
         self.reload()
         if not self.version:
@@ -232,6 +255,7 @@ class Resonance:
         self.save_state(spotify_version=self.version, extension_sha256=digest(self.installed), installed=True)
         print('Resonance updated; installation checks passed.', flush=True)
 
+    @mac_maintenance_transaction
     def uninstall(self, dry_run=False):
         self.reload()
         other_extensions = [name for name in self.extensions() if name != EXTENSION]

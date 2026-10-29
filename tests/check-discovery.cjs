@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {createUI}=require('./helpers/ui-harness.cjs');
+const {createUI,flush}=require('./helpers/ui-harness.cjs');
 function descendants(node){return [node,...(node.children||[]).flatMap(descendants)];}
 (async()=>{
  const ui=await createUI(),{api,context,get,calls}=ui;
@@ -31,7 +31,7 @@ function descendants(node){return [node,...(node.children||[]).flatMap(descendan
   if(url.includes('q=old'))return new Promise(resolve=>{oldResolve=resolve});
   return {tracks:{items:[{uri:'spotify:track:NEW',name:'Newest',artists:[{name:'Artist'}]}]},artists:{items:[{uri:'spotify:artist:FOUND',name:'Found artist'}]}};
  }};
- api.toggleSearch(true);get('search-input').value='old';const old=api.runSearch('old');
+ api.toggleSearch(true);get('search-input').value='old';const old=api.runSearch('old');await flush();
  get('search-input').value='new';await api.runSearch('new');
  oldResolve({tracks:{items:[{uri:'spotify:track:OLD',name:'Old result'}]}});await old;
  let nodes=descendants(get('search-results'));
@@ -39,7 +39,7 @@ function descendants(node){return [node,...(node.children||[]).flatMap(descendan
  assert(nodes.some(n=>n.attributes['aria-label']==='Add Newest to queue'));
  await nodes.find(n=>n.textContent==='Newest').onclick();assert.equal(calls.at(-1)[1],'spotify:track:NEW');
  get('search-input').value='pending';context.Spicetify.CosmosAsync.get=()=>new Promise(resolve=>{oldResolve=resolve});
- const pending=api.runSearch('pending');api.toggleSearch(false);oldResolve({tracks:{items:[{uri:'spotify:track:LATE',name:'Late'}]}});await pending;
+ const pending=api.runSearch('pending');await flush();api.toggleSearch(false);oldResolve({tracks:{items:[{uri:'spotify:track:LATE',name:'Late'}]}});await pending;
  assert.equal(get('search-panel').hidden,true);assert.equal(get('search-results').children.length,0);
  api.toggleSearch(true);ui.pressKey('Escape');assert.equal(get('search-panel').hidden,true);assert.equal(get('root').hidden,false);
  context.Spicetify.CosmosAsync.get=async()=>{throw Error('unavailable')};get('search-input').value='error';api.toggleSearch(true);await api.runSearch('error');assert.match(get('search-status').textContent,/Spotify search/i);

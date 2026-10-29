@@ -94,6 +94,44 @@ class MaintenanceTests(unittest.TestCase):
         self.manager.applied.write_text('broken')
         self.assertTrue(any('different extension' in x for x in self.manager.check()['issues']))
 
+
+@unittest.skipUnless(sys.platform=='darwin','Mac maintenance transaction locking')
+class MacTransactionTests(MaintenanceTests):
+    def test_concurrent_operations_stop_before_mutating_files(self):
+        import fcntl
+        lock_path=self.manager.config_dir/'Resonance'/'maintenance.lock'
+        lock_path.parent.mkdir(parents=True,exist_ok=True)
+        with lock_path.open('a') as held:
+            fcntl.flock(held,fcntl.LOCK_EX|fcntl.LOCK_NB)
+            before={p:p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
+            for action in ('update','uninstall'):
+                with self.subTest(action=action):
+                    with self.assertRaisesRegex(RuntimeError,'maintenance.*already running'):
+                        getattr(self.manager,action)()
+                    self.assertEqual(self.manager.commands,[])
+                    self.assertEqual(before,{p:p.read_bytes() for p in self.root.rglob('*') if p.is_file()})
+        # A leftover owner file is harmless once its advisory lock is released.
+        self.manager.update()
+        self.assertEqual(self.manager.check()['status'],'healthy')
+
+    def test_lock_covers_spicetify_commands_and_releases_after_failure(self):
+        second=module.Resonance(self.project,cli='fake-spicetify',config_path=self.config_path,runner=self.run_cli)
+        calls=[]
+        def fail_while_locked(*args,**kwargs):
+            for action in ('update','uninstall'):
+                with self.assertRaisesRegex(RuntimeError,'maintenance.*already running'):
+                    getattr(second,action)()
+            calls.append(args)
+            raise subprocess.CalledProcessError(1,args[0])
+        self.manager.runner=fail_while_locked
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.manager.update()
+        self.assertTrue(calls)
+        self.assertEqual(second.commands,[])
+        self.manager.runner=self.run_cli
+        self.manager.update()
+        self.assertEqual(self.manager.check()['status'],'healthy')
+
 class WindowsMaintenanceTests(MaintenanceTests):
     """Exercise all lifecycle paths with a Windows Spotify layout."""
     def setUp(self):
