@@ -1,3 +1,11 @@
+# 4.16.0 — Shared Mac, Windows and Linux release
+
+- Promote all 4.16 preview changes to main and matching Mac, Windows and Linux packages.
+- Include missing-lyrics artwork fallback, category search in Spotify order, album drawer/context playback, playlist queue, gradual Mesh color rotation, stronger artwork rhythm pulse, and progress-following vinyl tonearm.
+- Include the Up Next click-layer fix, metadata spacing, idle-wakeup reductions, safe missing-content caching and retryable provider errors.
+- Update Homebrew to the same shared source and restore all source-install instructions to main.
+- Automated verification covers macOS, Windows, Ubuntu and Fedora. Live desktop verification remains Mac-only; Windows/Linux Spotify sessions have not been exercised interactively.
+
 # 4.16.0-linux.1 — Fedora / Linux update
 
 - Bring Linux packages up to the shared interface from Mac preview 5: category search in Spotify order, selected-album drawer, album-context track playback, playlist queue, missing-lyrics fallback, and optional slow Mesh color rotation.

@@ -1,8 +1,6 @@
-> **Linux update:** [4.16.0-linux.1](https://github.com/Game0ver247/resonance/releases/tag/v4.16.0-linux.1) brings the latest interface and efficiency improvements to Fedora and other supported Linux installations. [Changelog](CHANGELOG.md). Mac, Windows and Homebrew releases are unchanged.
-
 # Resonance
 
-An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. This branch contains the **4.16 Linux preview**. Stable main/Homebrew remain on 4.15; Mac previews are published separately.
+An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current release: **4.16.0**, available for macOS, Windows and Linux (including Fedora). [Changelog](CHANGELOG.md).
 
 [![Cross-platform checks](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml/badge.svg)](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml)
 
@@ -14,13 +12,13 @@ An album-focused listening interface inside Spotify desktop, built with Spicetif
 - Art-left, centered-art, lyrics-only and Lyrics + artwork layouts, with song details along the bottom in the combined view.
 - Synced single-line and scrolling lyrics, click-to-seek, optional translations and per-song timing adjustments.
 - Album-colored keyword emphasis, automatic lyric contrast and animated musical-note interludes.
-- Cover or BPM-driven vinyl artwork, coasting pause animation and optional beat pulse.
-- Opaque Dark, Artwork, animated album-color Mesh and static Accent backgrounds; Mesh uses up to eight distinct cover-color splashes.
+- Cover or BPM-driven vinyl artwork, progress-following tonearm, coasting pause animation and optional beat pulse.
+- Opaque Dark, Artwork, animated album-color Mesh and static Accent backgrounds; Mesh uses up to eight distinct cover-color splashes with optional slow time- or beat-based color rotation.
 - Five accent colors or vivid album-matching accents, with a colorful fallback for monochrome covers.
 - Waves, Ribbon, Bars and Dots; Calm, Tight, Flow and Punch motion presets.
 - Album details, playable tracklists with Add to queue, clickable artist names, credits and available sourced album background information.
 - Click outside settings, search, album details or the queue to dismiss the panel.
-- Compact expandable search: six results initially, more fetched as you scroll (up to 60 ranked preview results). Play songs, open artist pages, play full albums or add songs to the queue.
+- Compact expandable search: six results initially, more fetched as you scroll (up to 60 ranked preview results). Choose Songs, Albums or Playlists tabs in Spotify result order. Artist names search within Resonance; albums play and open details, playlists play and open the queue, and album tracks retain album context.
 - Balanced rendering capped near 30 fps, paused-frame reuse, hidden-page suspension and a Low power option under Advanced.
 - Reduced-motion support, fullscreen controls, local preference storage and optional diagnostics.
 - Update, uninstall and installation-health commands with recovery backups.
@@ -78,7 +76,7 @@ cd resonance
 Follow [the Linux setup guide](LINUX.md) to configure Flatpak or native Spotify and its permissions. On Fedora, install prerequisites with `sudo dnf install python3 git`. Then:
 
 ```sh
-git clone --branch linux-preview/4.16 --single-branch https://github.com/Game0ver247/resonance.git
+git clone https://github.com/Game0ver247/resonance.git
 cd resonance
 sh resonance.sh update
 ```

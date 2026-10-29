@@ -1,5 +1,7 @@
 # Resonance for Windows
 
+Release 4.16 includes the latest shared search, playback, lyrics, Mesh, vinyl tonearm and efficiency updates.
+
 Start with the Windows section of [README.md](README.md). After installing Spotify, Spicetify and Python 3.9+, extract this entire folder and double-click **Install Resonance.cmd**.
 
 | File | Action |

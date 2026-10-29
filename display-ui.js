@@ -1,6 +1,6 @@
 // NAME: Resonance Display
 // AUTHOR: Local customization
-// VERSION: 4.16.0-linux.1
+// VERSION: 4.16.0
 // DESCRIPTION: Album-focused Spotify listening view with synced lyrics, track-analysis visuals and playback controls.
 (() => {
   if (document.getElementById('resonance-launch')) return;
