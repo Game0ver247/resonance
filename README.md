@@ -1,4 +1,4 @@
-> **Mac preview:** [4.16.0-mac.2](https://github.com/Game0ver247/resonance/releases/tag/v4.16.0-mac.2) adds search tabs, playlist discovery and missing-lyrics fallback. [Changelog](CHANGELOG.md). This branch is a Mac trial; stable/Homebrew/Windows/Linux remain on 4.15.0. Download the Mac preview and run its Update Resonance.command. Running the stable Homebrew updater will reinstall stable source.
+> **Mac preview:** [4.16.0-mac.3](https://github.com/Game0ver247/resonance/releases/tag/v4.16.0-mac.3) adds search tabs, playlist discovery and missing-lyrics fallback. [Changelog](CHANGELOG.md). This branch is a Mac trial; stable/Homebrew/Windows/Linux remain on 4.15.0. Download the Mac preview and run its Update Resonance.command. Running the stable Homebrew updater will reinstall stable source.
 
 # Resonance
 

@@ -1,10 +1,10 @@
 {
   "name": "resonance-spotify",
-  "version": "4.16.0-mac.2",
+  "version": "4.16.0-mac.3",
   "private": true,
   "description": "Album-focused listening interface for Spotify desktop on macOS, Windows and Linux through Spicetify",
   "scripts": {
-    "test": "node tests/check-extension.cjs && node tests/check-lyrics.cjs && node tests/check-races.cjs && node tests/check-discovery.cjs && node tests/check-queue-controls.cjs && node tests/check-performance.cjs && node tests/check-search-pages.cjs && node tests/check-artwork-lyrics.cjs && node tests/check-interlude.cjs && node tests/check-appearance-polish.cjs && node tests/check-album-playback.cjs && node tests/check-discovery-tabs.cjs && node tests/check-lyric-fallback.cjs && node tests/check-control-timeouts.cjs && node tests/check-search-bootstrap.cjs && node tests/check-idle-analysis.cjs && node tests/check-listening-actions.cjs && node tests/check-mesh-rotation.cjs",
+    "test": "node tests/check-extension.cjs && node tests/check-lyrics.cjs && node tests/check-races.cjs && node tests/check-discovery.cjs && node tests/check-queue-controls.cjs && node tests/check-performance.cjs && node tests/check-search-pages.cjs && node tests/check-artwork-lyrics.cjs && node tests/check-interlude.cjs && node tests/check-appearance-polish.cjs && node tests/check-album-playback.cjs && node tests/check-discovery-tabs.cjs && node tests/check-lyric-fallback.cjs && node tests/check-control-timeouts.cjs && node tests/check-search-bootstrap.cjs && node tests/check-idle-analysis.cjs && node tests/check-listening-actions.cjs && node tests/check-mesh-rotation.cjs && node tests/check-request-caching.cjs",
     "test:maintenance": "python3 -m unittest discover -s tests -p 'test_*.py'"
   },
   "engines": {

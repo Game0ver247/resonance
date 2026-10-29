@@ -1,0 +1,44 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Resonance perf page</title><style>body{margin:0;background:#111;font-family:system-ui}</style></head><body>
+<script>
+// Measurement-only mock of the Spotify desktop surface used by Resonance.
+// Counters let the driver compare background work before and after a change.
+const params=new URLSearchParams(location.search);
+const counts={};const bump=name=>{counts[name]=(counts[name]||0)+1;};
+window.__counts=counts;
+let nodeCount=Number(params.get('nodes')||4000);
+// Rough stand-in for Spotify's large host DOM: native lookups must walk past it.
+{const host=document.createElement('div');host.id='fake-spotify';
+ for(let i=0;i<nodeCount/4;i++){const row=document.createElement('div');row.className='row';row.innerHTML='<a href="/playlist/'+i+'"><span>Item '+i+'</span></a><button data-testid="noise-'+i+'"></button><img alt="">';host.append(row);}
+ const duration=document.createElement('div');duration.setAttribute('data-testid','playback-duration');duration.textContent='4:00';host.append(duration);
+ document.body.append(host);}
+const instrument=params.get('instrument')!=='0';
+if(instrument){
+for(const name of ['querySelector','querySelectorAll']){const original=Document.prototype[name];document[name]=function(...args){bump('document.'+name);return original.apply(this,args);};}
+{const original=Document.prototype.getElementById;document.getElementById=function(id){bump('getElementById');return original.call(this,id);};}
+}
+{window.fetch=function(url){const href=String(url);
+  // LRCLIB has no lyrics (404); Wikipedia answers with no matching page (a definite "none").
+  if(/wikipedia/.test(href)){bump('fetch.wikipedia');return Promise.resolve(new Response(JSON.stringify({query:{pages:{}}}),{status:200}));}
+  bump(/lrclib/.test(href)?'fetch.lrclib':'fetch.other');return Promise.resolve(new Response('{}',{status:404}));};}
+const tracks=n=>({uri:'spotify:track:T'+n,metadata:{title:'Track '+n,artist_name:'Artist',album_title:'Album '+Math.floor(n/4),album_uri:'spotify:album:A'+Math.floor(n/4),duration:'240000'},artists:[{name:'Artist',uri:'spotify:artist:AR1'}],album:{uri:'spotify:album:A'+Math.floor(n/4)}});
+let trackNumber=0,paused=false,anchorProgress=0,anchorTime=performance.now(),contextName=params.get('context')!=='none';
+const lines=Array.from({length:60},(_,i)=>({startTimeMs:String(i*4000),words:['The evening settles softly around us','We find a quiet place to breathe','A little light stays with the room','Every passing moment feels like home'][i%4]}));
+const progress=()=>paused?anchorProgress:anchorProgress+(performance.now()-anchorTime);
+const player={
+ get data(){bump('Player.data');return{isPaused:paused,item:tracks(trackNumber),context:{uri:'spotify:collection:tracks',metadata:contextName?{context_description:'Evening mix'}:{}},nextItems:[tracks(trackNumber+1),tracks(trackNumber+2)].map(t=>({contextTrack:t}))};},
+ origin:{get _state(){return{isPaused:paused};}},
+ getProgress:()=>{bump('getProgress');return progress();},getDuration:()=>240000,getShuffle:()=>false,getRepeat:()=>0,
+ seek:async value=>{anchorProgress=value;anchorTime=performance.now();},togglePlay(){},back(){},next(){},setRepeat(){},setShuffle(){}};
+window.Spicetify={Player:player,
+ Platform:{LibraryAPI:{contains:async()=>{bump('LibraryAPI.contains');return[false];},add:async()=>{},remove:async()=>{}}},
+ CosmosAsync:{get:async url=>{bump('Cosmos.'+(/color-lyrics/.test(url)?'lyrics':/wikipedia/.test(url)?'wikipedia':'other'));return/color-lyrics/.test(url)?(trackNumber%2?{}:{lyrics:{syncType:'LINE_SYNCED',language:'en',lines}}):{};}},
+ GraphQL:{Definitions:{},Request:async()=>{bump('GraphQL.Request');return{data:{}};}},
+ getAudioData:async()=>{bump('getAudioData');return{track:{tempo:112},segments:Array.from({length:240},(_,i)=>({start:i,duration:1,loudness_max:-12,loudness_max_time:.1,timbre:Array(12).fill(i%5),pitches:Array(12).fill(.5)})),beats:Array.from({length:448},(_,i)=>({start:i*60/112,duration:60/112,confidence:.9})),sections:[{start:0,loudness:-15},{start:120,loudness:-10}]};},
+ colorExtractor:async()=>({vibrant:'#d59ca7',dark:'#17312e',muted:'#566e6b'})};
+window.__mock={setTrack(n){trackNumber=n;anchorProgress=0;anchorTime=performance.now();},setPaused(value){anchorProgress=progress();anchorTime=performance.now();paused=value;},contextName(value){contextName=value;}};
+// Count animation-frame callbacks that actually run.
+if(instrument){{const original=window.requestAnimationFrame.bind(window);window.requestAnimationFrame=fn=>original(now=>{bump('rafCallbacks');fn(now);});}
+for(const name of ['setTimeout','setInterval']){const original=window[name].bind(window);window[name]=(fn,ms,...rest)=>original(typeof fn==='function'?(...args)=>{bump(name+'Callbacks');return fn(...args);}:fn,ms,...rest);}}
+const script=document.createElement('script');script.src=params.get('bundle')||'../../resonanceDisplay.js';
+script.onload=()=>{window.__ready=true;};document.body.append(script);
+</script></body></html>

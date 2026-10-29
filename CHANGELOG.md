@@ -1,3 +1,12 @@
+# 4.16.0-mac.3 — Mac performance and request review
+
+- Idle states (paused, Low power, reduced motion) wait on a ~100 ms timer between redraws instead of waking for every display frame. In a mocked-Spotify Chrome page this cut paused/Low-power CPU by about a third; no playback improvement was established. These are whole-browser mock-page comparisons, not actual Spotify CPU or battery measurements. Measured with `tests/perf/measure-browser.cjs`.
+- Album background lookups no longer repeat a Wikipedia request on every track change when Wikipedia has no verified match; failed lookups still retry.
+- "No lyrics" answers are remembered for 10 minutes when both sources answered definitively (not after timeouts/errors).
+- A failed track-analysis request is no longer cached as "no analysis" for that track; revisiting it can retry, without a continuous retry loop.
+- Treat resolved Spotify/Wikipedia error payloads and malformed provider responses as retryable failures, not confirmed missing content.
+- Add regression tests for the above and an optional real-browser measurement script (not part of `npm test`).
+
 # 4.16.0-mac.2 — Native search order and contextual playback
 
 Mac preview only; stable main, Homebrew and Windows/Linux remain unchanged.

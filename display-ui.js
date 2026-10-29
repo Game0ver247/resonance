@@ -1,6 +1,6 @@
 // NAME: Resonance Display
 // AUTHOR: Local customization
-// VERSION: 4.16.0-mac.2
+// VERSION: 4.16.0-mac.3
 // DESCRIPTION: Album-focused Spotify listening view with synced lyrics, track-analysis visuals and playback controls.
 (() => {
   if (document.getElementById('resonance-launch')) return;
@@ -668,7 +668,11 @@
     get('lyric-line').disabled=true;get('lyric-line').onclick=null;expandedKey='';
     lyricRevision++;lyricKey=key;lyricOffset=Number(lyricOffsets[uri])||0;syncOffsetUI();const generation=++lyricLoad;lyricRows=[];lyricSettled=false;lyricState='Finding lyrics…';lyricSource='';
     if(!uri.startsWith('spotify:track:')||!meta.title){lyricState='Play a song to see lyrics';return;}
-    if(lyricCache.has(key)){const cached=lyricCache.get(key);lyricRows=cached.rows;lyricSource=cached.source;lyricState=cached.state;lyricSettled=true;return;}
+    const cached=lyricCache.get(key);
+    if(cached&&!(cached.expires<Date.now())){lyricRows=cached.rows;lyricSource=cached.source;lyricState=cached.state;lyricSettled=true;return;}
+    lyricCache.delete(key);
+    // Remember "no lyrics" only when every source gave a definite answer, never after a timeout or network error.
+    let answered=true;
     const accept=(rows,source)=>{
       if(generation!==lyricLoad||!rows.length)return false;
       lyricRevision++;lyricRows=rows;lyricSource=source;lyricState='';return true;
@@ -676,8 +680,9 @@
     try {
       const endpoint='https://spclient.wg.spotify.com/color-lyrics/v2/track/'+encodeURIComponent(uri.split(':')[2])+'?format=json&vocalRemoval=false&market=from_token&clientLanguage=en';
       const payload=await withTimeout(Spicetify.CosmosAsync.get(endpoint),6500,'Lyrics timeout');
+      if(!payload?.lyrics||!Array.isArray(payload.lyrics.lines)||payload.error)answered=false;
       accept(ResonanceLyrics.spotify(payload,duration),'Spotify');
-    }catch{}
+    }catch(error){if((error?.status??error?.code)!==404)answered=false;}
     if(generation!==lyricLoad)return;
     // Only request the fallback when Spotify supplies no synced lines.
     if(!lyricRows.length) {
@@ -686,18 +691,20 @@
         const query=new URLSearchParams({track_name:meta.title,artist_name:meta.artist_name||'',album_name:meta.album_title||'',duration:String(Math.round(duration/1000))});
         const response=await fetch('https://lrclib.net/api/get?'+query,{signal:abort.signal});
         if(response.ok){const data=await response.json();
+          if(typeof data?.trackName!=='string'||typeof data?.instrumental!=='boolean')answered=false;
           if(generation!==lyricLoad)return;
           const validTitle=!data.trackName||normalize(data.trackName)===normalize(meta.title);
           const validDuration=!data.duration||Math.abs(data.duration*1000-duration)<2500;
           if(validTitle&&validDuration){const rows=ResonanceLyrics.lrc(data.syncedLyrics,duration);accept(rows,'LRCLIB');if(data.instrumental&&!lyricRows.length)lyricState='Instrumental';}
-        }
-      }catch{}finally{clearTimeout(timeout);}
+        }else if(response.status!==404)answered=false;
+      }catch{answered=false;}finally{clearTimeout(timeout);}
     }
     if(generation!==lyricLoad)return;
     lyricSettled=true;
     if(!lyricRows.length&&lyricState!=='Instrumental')lyricState='Synced lyrics unavailable for this song';
     if(lyricCache.size>=50)lyricCache.delete(lyricCache.keys().next().value);
     if(lyricRows.length)lyricCache.set(key,{rows:lyricRows,source:lyricSource,state:lyricState});
+    else if(answered)lyricCache.set(key,{rows:[],source:'',state:lyricState,expires:Date.now()+600000});
   }
   // Local visual heuristic, not word timing or a language-understanding service.
   const lyricStopWords=new Set(("a an the and or but so if as at by for from in into of off on out to up with without i me my mine myself you your yours yourself he him his she her hers it its we us our ours they them their theirs this that these those is am are was were be been being do does did done have has had having can could will would shall should may might must not no yes just really very even ever never all any some something anything everything nothing someone anyone everyone only still then than when where what who why how there here now again too more most much such each every both same other another own don't doesn't didn't can't won't wouldn't isn't aren't wasn't weren't i'm i've i'll i'd you're you've you'll you'd he's she's we're we've they're they've it's that's there's oh ooh ah yeah hey la na de la el los las un una y en que por para con es mi tu se le les des une et je te il elle nous vous ne pas au aux du ce ça c'est der die das ein eine und ich du er sie wir ihr im zu mit von ist nicht mein dein").split(/\s+/));
@@ -1167,16 +1174,19 @@
     const extract=page.extract||'';
     return !!artist&&base.length>0&&pageTitle===base&&normalize(extract).includes(normalize(artist))&&/\b(album|EP|compilation|record)\b/i.test(extract);
   }
+  // Resolves to a background, null when Wikipedia has no verified match, or undefined when the lookup was skipped or failed.
   async function fetchAlbumBackground(title,artist){
-    if(!title||!artist)return null;
+    if(!title||!artist)return undefined;
     const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),7000);
     try{
       const query=new URLSearchParams({action:'query',generator:'search',gsrsearch:'"'+title+'" "'+artist+'" album',gsrlimit:'3',gsrnamespace:'0',prop:'extracts|info',exintro:'1',explaintext:'1',exsentences:'3',inprop:'url',format:'json',origin:'*'});
-      const response=await fetch('https://en.wikipedia.org/w/api.php?'+query,{signal:abort.signal});if(!response.ok)return null;
-      const data=await response.json(),pages=Object.values(data?.query?.pages||{}),page=pages.find(p=>matchAlbumBackground(p,title,artist));
+      const response=await fetch('https://en.wikipedia.org/w/api.php?'+query,{signal:abort.signal});if(!response.ok)return undefined;
+      const data=await response.json();
+      if(data?.error||!data?.query?.pages||typeof data.query.pages!=='object')return undefined;
+      const pages=Object.values(data.query.pages),page=pages.find(p=>matchAlbumBackground(p,title,artist));
       if(!page||!/^https:\/\/en\.wikipedia\.org\//.test(page.fullurl||''))return null;
       const words=page.extract.trim().split(/\s+/);return {text:words.slice(0,100).join(' ')+(words.length>100?'…':''),url:page.fullurl};
-    }catch{return null;}finally{clearTimeout(timer);}
+    }catch{return undefined;}finally{clearTimeout(timer);}
   }
   let albumDetailsKey='',albumDetailsGeneration=0,albumDetails=null,selectedAlbum='';
   function openAlbum(uri){
@@ -1216,7 +1226,7 @@
     (albumCache.has(uri)?Promise.resolve(albumCache.get(uri)):fetchAlbum(uri).then(value=>remember(albumCache,uri,value))).then(value=>{if(current())albumDetails.album=value;}).catch(()=>{}).finally(()=>{if(current()){albumDetails.albumDone=true;renderAlbumDetails();}});
     if(trackURI)(creditsCache.has(trackURI)?Promise.resolve(creditsCache.get(trackURI)):fetchCredits(trackURI).then(value=>remember(creditsCache,trackURI,value))).then(value=>{if(current())albumDetails.credits=value;}).catch(()=>{}).finally(()=>{if(current()){albumDetails.creditsDone=true;renderAlbumDetails();}});
     const title=albumDetails.title,artist=albumDetails.artist;
-    (backgroundCache.has(uri)?Promise.resolve(backgroundCache.get(uri)):fetchAlbumBackground(title,artist).then(value=>value?remember(backgroundCache,uri,value):null)).then(value=>{if(current())albumDetails.background=value;}).finally(()=>{if(current()){albumDetails.backgroundDone=true;renderAlbumDetails();}});
+    (backgroundCache.has(uri)?Promise.resolve(backgroundCache.get(uri)):fetchAlbumBackground(title,artist).then(value=>value===undefined?null:remember(backgroundCache,uri,value))).then(value=>{if(current())albumDetails.background=value;}).finally(()=>{if(current()){albumDetails.backgroundDone=true;renderAlbumDetails();}});
   }
   function toggleAlbumDetails(){
     if(!get('search-panel').hidden)toggleSearch(false);
@@ -1308,7 +1318,7 @@
       const valid=data&&Array.isArray(data.segments)&&data.segments.some(s=>Number.isFinite(s.start)&&Number.isFinite(s.loudness_max));
       cacheAnalysis(uri,valid?data:null);accept(valid?data:null);
       console.info('[Resonance] Track analysis',valid?'available':'unavailable');
-    }catch(error){cacheAnalysis(uri,null);accept(null);console.info('[Resonance] Track analysis unavailable',error?.message||'Request failed');}
+    }catch(error){accept(null);console.info('[Resonance] Track analysis unavailable',error?.message||'Request failed');}
   }
   const clamp01=value=>Number.isFinite(value)?Math.max(0,Math.min(1,value)):0;
   function analysisCapabilities(data){return {segments:data?.segments?.length||0,sections:data?.sections?.length||0,timbre:!!data?.segments?.some(s=>Array.isArray(s.timbre)&&s.timbre.length>=12&&s.timbre.every(Number.isFinite)),pitches:!!data?.segments?.some(s=>Array.isArray(s.pitches)&&s.pitches.length>=12&&s.pitches.every(Number.isFinite))};}
@@ -1452,12 +1462,17 @@
       'accent '+accentName+'  rgb('+accentRGB.join(',')+')'
     ].join('\n');
   }
+  let frameTimer=0;
+  function stopDrawing(){cancelAnimationFrame(frame);clearTimeout(frameTimer);frameTimer=0;}
+  function startDrawing(){stopDrawing();frame=requestAnimationFrame(draw);}
   function draw(now) {
     if(root.hidden||document.hidden)return;
-    frame=requestAnimationFrame(draw);
     const lowPower=root.dataset.power==='low',isPlaying=playing();
-    const interval=lowPower||reduced.matches||(!isPlaying&&vinylState.speed===0)?100:1000/30;
-    if(now-previous<interval-.5)return;
+    const idle=lowPower||reduced.matches||(!isPlaying&&vinylState.speed===0),interval=idle?100:1000/30;
+    // Idle states redraw at ~10 fps, so wait on a timer instead of waking for every display frame.
+    if(idle)frameTimer=setTimeout(()=>{frameTimer=0;frame=requestAnimationFrame(draw);},interval-8);
+    else frame=requestAnimationFrame(draw);
+    if(!idle&&now-previous<interval-.5)return;
     const delta = previous ? Math.min((now-previous)/1000,.1) : 0;
 
     previous=now;
@@ -1534,8 +1549,8 @@
       }ctx.stroke();}
   }
 
-  function close() { hideLyricScrollbar();toggleSearch(false); cancelAnimationFrame(lyricScroll);clearTimeout(idleTimer);root.dataset.idle='false';root.hidden=true;cancelAnimationFrame(frame);if(document.fullscreenElement===root) document.exitFullscreen().catch(()=>{});oldFocus?.focus(); }
-  launch.onclick = () => {oldFocus=document.activeElement;root.hidden=false;visualDirty=true;canvasSize=null;checkedURI='';update();wakeControls();get('exit').focus();previous=0;fitArtwork();cancelAnimationFrame(frame);frame=requestAnimationFrame(draw);};
+  function close() { hideLyricScrollbar();toggleSearch(false); cancelAnimationFrame(lyricScroll);clearTimeout(idleTimer);root.dataset.idle='false';root.hidden=true;stopDrawing();if(document.fullscreenElement===root) document.exitFullscreen().catch(()=>{});oldFocus?.focus(); }
+  launch.onclick = () => {oldFocus=document.activeElement;root.hidden=false;visualDirty=true;canvasSize=null;checkedURI='';update();wakeControls();get('exit').focus();previous=0;fitArtwork();startDrawing();};
   get('exit').onclick=close;
   get('fullscreen').onclick=async()=>{try{if(document.fullscreenElement===root) await document.exitFullscreen();else await root.requestFullscreen();}catch{text('status','Use Spotify’s View menu to enter fullscreen.');}};
   document.addEventListener('pointerdown',event=>{
@@ -1564,8 +1579,8 @@
     e.preventDefault();e.stopPropagation();wakeControls();
   });
   document.addEventListener('visibilitychange',()=>{
-    root.dataset.pageHidden=String(!!document.hidden);if(document.hidden)hideLyricScrollbar();cancelAnimationFrame(frame);cancelAnimationFrame(lyricScroll);
-    if(!document.hidden&&!root.hidden){previous=0;visualDirty=true;canvasSize=null;expandedKey='';update();frame=requestAnimationFrame(draw);}
+    root.dataset.pageHidden=String(!!document.hidden);if(document.hidden)hideLyricScrollbar();stopDrawing();cancelAnimationFrame(lyricScroll);
+    if(!document.hidden&&!root.hidden){previous=0;visualDirty=true;canvasSize=null;expandedKey='';update();startDrawing();}
   });
   setInterval(update,500);
   if(globalThis.__RESONANCE_TEST__) globalThis.__RESONANCE_TEST_API__={meshStep,setMeshRotation,setSearchCategory,searchArtist,playAlbum,loadMoreSearch,setPower,playTrack,addQueueButton,openEntity,artistEntities,toggleSearch,runSearch,normalizeSearch,loadLyrics,drawLyrics,setLyricLine,flashStatus,renderUpNext,artistCredits,queuedTracks,canHideControls,wakeControls,playbackSource,seekLyric,toggleExpanded,setTheme,albumAccent,nudgeLyrics,paintDebug,loadAnalysis,analysisResponse,analysisFeatures,prepareAnalysis,analysisCapabilities,setVisualStyle,setMotion,setLayout,setBeatUI,vinylStep,MODES,nextPhase,smoothResponse,setBackground,setArtworkMode,setLyricStyle,setSingleLine,setKeywordEmphasis,lyricKeywords,lyricContrast,contrastRatio,paletteFromPixels,showPalette,lyricContent,scrollLyrics,syncLyricsVisibility,queueAction,trackDuration,trackImage,transitionArtwork,normalizeAlbum,normalizeCredits,matchAlbumBackground,toggleAlbumDetails,loadAlbumDetails};
