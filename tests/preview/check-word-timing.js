@@ -5,6 +5,7 @@
  if(rows.length!==1||rows[0].text!=='Hello world'||rows[0].words.length!==3)throw Error('TTML syllable parsing failed: '+JSON.stringify(rows));
  if(rows[0].words[1].text!=='lo '||rows[0].words[2].start!==2500)throw Error('Whitespace or timestamps lost');
  if(e.ttml('<!DOCTYPE x><tt/>',10000).length||e.ttml('<tt><p>',10000).length)throw Error('Unsafe/malformed XML accepted');
+ const formatted=e.ttml(xml.replace('</span> <span','</span>\n  <span'),10000);if(formatted[0].text!=='Hello world')throw Error('XML whitespace collapsed words');
  const baseline=[{text:'Hello world',start:1000,end:4000}];
  if(!e.matchesTiming(rows,baseline,10000)||e.matchesTiming(rows,[{text:'Wrong song',start:1000}],10000))throw Error('Recording match failed');
  const root=document.getElementById('resonance-root');if(root.hidden)document.getElementById('resonance-launch').click();

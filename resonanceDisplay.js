@@ -96,7 +96,7 @@ return module.exports;})();
       const rows=lines.map(p=>{
         let text='',words=[];
         function walk(node){
-          if(node.nodeType===3){if(/^\s*$/.test(node.textContent)&&/[\r\n]/.test(node.textContent))return;const value=node.textContent.replace(/\s+/g,' ');text+=value;if(words.length&&/^\s+$/.test(value))words.at(-1).text+=value;return;}
+          if(node.nodeType===3){const value=node.textContent.replace(/\s+/g,' ');text+=value;if(words.length&&/^\s+$/.test(value))words.at(-1).text+=value;return;}
           if(node.nodeType!==1)return;
           const role=node.getAttribute('ttm:role')||'';if(/translation|roman/i.test(role))return;
           const descendants=[...node.getElementsByTagNameNS('*','span')].some(n=>n.hasAttribute('begin'));
