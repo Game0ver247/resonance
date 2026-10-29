@@ -19,7 +19,7 @@ function descendants(node){return [node,...(node.children||[]).flatMap(descendan
  api.toggleAlbumDetails();await new Promise(setImmediate);await new Promise(setImmediate);
  let albumNodes=descendants(get('album-panel-content'));
  const albumSong=albumNodes.find(n=>n.tag==='button'&&n.textContent==='Album song');
- assert(albumSong,'album songs must be clickable');await albumSong.onclick();assert.equal(calls.at(-1)[1],'spotify:track:ALBUMSONG');
+ assert(albumSong,'album songs must be clickable');await albumSong.onclick();assert.equal(calls.at(-1)[1],'spotify:album:TESTALBUM');
  assert(albumNodes.some(n=>n.attributes['aria-label']==='Add Album song to queue'));
  assert(albumNodes.some(n=>n.tag==='button'&&n.textContent==='Album artist'));
  api.openEntity('spotify:artist:ARTIST');assert.equal(calls.at(-1)[1],'/artist/ARTIST');

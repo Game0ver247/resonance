@@ -1,3 +1,18 @@
+# 4.16.0-mac.2 — Native search order and contextual playback
+
+Mac preview only; stable main, Homebrew and Windows/Linux remain unchanged.
+
+- Separate artist and album controls onto their own lines with clear spacing in lyrics view.
+- Remove ownership filtering/reranking from search. Preserve Spotify's returned category ordering for songs, albums and playlists; keep bounded, on-demand pagination.
+- Play and open the selected album in Resonance's album-details drawer from all album-name actions. The drawer no longer depends on waiting for current playback metadata to change.
+- Play album tracks with the album context and Spotify's `skipTo.uri` option, letting Spotify continue the remaining album according to the user's existing shuffle/repeat settings. Do not duplicate tracks into the manual queue.
+- Play a playlist and open Spotify's live queue in Resonance. Existing queued items and Spotify's queue semantics are preserved.
+- Make Up Next a keyboard-accessible button that invokes Spotify's normal next-track action.
+- Add Mesh color rotation: Off (default), Time (12 seconds), or Beats (32 detected beats), with eight-second crossfades through the album palette. Use the existing rendering clock; no new loops or per-frame gradient rebuilding. Skip initiation when paused, hidden, reduced motion or Low power.
+- Strengthen the artwork pulse with estimated rhythm energy and a small directional shake; keep motion disabled under reduced motion/Low power. This uses track-analysis onset/beat proxies, not live bass-frequency capture.
+
+Validation: full JavaScript regression suite, Python suite and Mac installation checks. Real-browser geometry confirms distinct title/artist/album rows with no overlap in the checked lyrics layout. Context playback arguments match the installed Spotify player interface.
+
 # 4.16.0-mac.1 — Mac preview: discovery and lyric fallback
 
 This preview is for macOS. Stable main, Homebrew, Windows and Linux remain on 4.15.0 until the Mac changes have been tried.
