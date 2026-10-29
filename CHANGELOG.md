@@ -1,3 +1,9 @@
+# 4.14.0 — Lyrics + artwork layout
+
+- Replace Karaoke with a combined artwork-and-scrolling-lyrics view.
+- Show title, artist and album along the bottom; use responsive stacked artwork/lyrics on narrow windows.
+- Preserve existing saved Karaoke layout preferences and low-power behavior.
+
 # 4.13.0 — Lower rendering load and expanding search
 
 - Cap active rendering near 30 fps, cache canvas sizing, bound waveform samples and reuse geometry across lines.
