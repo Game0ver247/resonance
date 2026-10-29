@@ -1,6 +1,6 @@
 // NAME: Resonance Display
 // AUTHOR: Local customization
-// VERSION: 4.16.0-mac.3
+// VERSION: 4.16.0-mac.4
 // DESCRIPTION: Album-focused Spotify listening view with synced lyrics, track-analysis visuals and playback controls.
 (() => {
   if (document.getElementById('resonance-launch')) return;
@@ -52,7 +52,7 @@
   #resonance-track:hover::-webkit-slider-thumb,#resonance-track:focus-visible::-webkit-slider-thumb {opacity:1}
   #resonance-track:focus-visible {outline:1px solid rgba(var(--accent-rgb),.5);outline-offset:3px;border-radius:6px}
   #resonance-track:disabled {opacity:.4;cursor:default}
-  #resonance-up-next {font:inherit;color:inherit;text-align:left;cursor:pointer;position:absolute;right:0;bottom:14px;max-width:46%;padding:10px 16px;border:1px solid #ffffff15;border-radius:12px;background:#ffffff08;animation:resonance-preview .35s ease-out}
+  #resonance-up-next {z-index:1;font:inherit;color:inherit;text-align:left;cursor:pointer;position:absolute;right:0;bottom:14px;max-width:46%;padding:10px 16px;border:1px solid #ffffff15;border-radius:12px;background:#ffffff08;animation:resonance-preview .35s ease-out}
   #resonance-up-next[hidden] {display:none}
   #resonance-up-next-label {font:10px monospace;letter-spacing:2px;color:var(--accent);margin-bottom:5px}
   #resonance-up-next-title {font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

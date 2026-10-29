@@ -1,3 +1,9 @@
+# 4.16.0-mac.4 — Clickable Up Next in lyrics view
+
+- Put the Up Next button above the scrolling lyrics pane so pointer clicks reach it instead of seeking a lyric underneath.
+- Verify actual browser hit testing and mouse input, in addition to the existing playback-handler regression test.
+- Mac preview only; stable main, Homebrew and other platform releases unchanged.
+
 # 4.16.0-mac.3 — Mac performance and request review
 
 - Idle states (paused, Low power, reduced motion) wait on a ~100 ms timer between redraws instead of waking for every display frame. In a mocked-Spotify Chrome page this cut paused/Low-power CPU by about a third; no playback improvement was established. These are whole-browser mock-page comparisons, not actual Spotify CPU or battery measurements. Measured with `tests/perf/measure-browser.cjs`.
