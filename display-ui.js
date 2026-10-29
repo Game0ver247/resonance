@@ -1,6 +1,6 @@
 // NAME: Resonance Display
 // AUTHOR: Local customization
-// VERSION: 4.16.0
+// VERSION: 4.16.1
 // DESCRIPTION: Album-focused Spotify listening view with synced lyrics, track-analysis visuals and playback controls.
 (() => {
   if (document.getElementById('resonance-launch')) return;
@@ -525,8 +525,26 @@
   let artwork = '', phase = 0, previous = 0, frame = 0, oldFocus;
   let savingURI = '', checkedURI = '';
   const savedTracks = new Map();
-  function currentTrack() {
-    try { return Spicetify.Player.data?.item || Spicetify.Player.origin?._state?.item || null; } catch { return null; }
+  let fallbackPlayerState=null;
+  function wrapperPlayerState(){
+    try{for(const state of [Spicetify.Player.data,Spicetify.Player.origin?._state])if(state?.item?.uri)return state;}catch{}
+    return null;
+  }
+  function refreshPlayerState(){
+    fallbackPlayerState=null;
+    if(wrapperPlayerState())return;
+    try{const state=Spicetify.Platform?.PlayerAPI?.getState?.();if(state?.item?.uri)fallbackPlayerState=state;}catch{}
+  }
+  function playerState(){return wrapperPlayerState()||fallbackPlayerState;}
+  function currentTrack(){return playerState()?.item||null;}
+  function playbackDuration(){
+    if(fallbackPlayerState)return Math.max(0,Number(fallbackPlayerState.duration)||0);
+    try{return Spicetify.Player.getDuration()||0;}catch{return 0;}
+  }
+  function playbackProgress(){
+    const state=fallbackPlayerState;
+    if(state){const elapsed=!state.isPaused&&Number.isFinite(state.timestamp)?Math.max(0,Date.now()-state.timestamp):0;return Math.min(playbackDuration(),Math.max(0,(Number(state.positionAsOfTimestamp)||0)+elapsed));}
+    try{return Spicetify.Player.getProgress()||0;}catch{return 0;}
   }
   function artistCredits(track) {
     const meta=track?.metadata||{},names=[];
@@ -625,7 +643,7 @@
   function native(selector) { return document.querySelector(selector); }
   function playing() {
     try {
-      const state = window.Spicetify?.Player?.origin?._state || window.Spicetify?.Player?.data;
+      const state = fallbackPlayerState||window.Spicetify?.Player?.origin?._state||playerState();
       if(typeof state?.isPaused === 'boolean') return !state.isPaused;
     } catch {}
     const toggle = native('[data-testid="control-button-playpause"]');
@@ -752,7 +770,7 @@
   function drawLyrics() {
     if(!showLyrics)return;
     syncLyricFallback();
-    let position=0;try{position=Spicetify.Player.getProgress();}catch{}
+    let position=0;try{position=playbackProgress();}catch{}
     position-=lyricOffset;
     const selected=ResonanceLyrics.active(lyricRows,position),timedRow=lyricRows[selected.line],row=timedRow&&/[\p{L}\p{N}]/u.test(timedRow.text)?timedRow:null;
     setLyricLine(row?.text || (lyricRows.length?'♪':lyricState),!!row,row);
@@ -761,7 +779,7 @@
   }
   async function seekLyric(uri,start) {
     if(uri!==currentURI()||!Number.isFinite(start))return;
-    try{await Spicetify.Player.seek(Math.round(Math.max(0,Math.min(start+lyricOffset,Spicetify.Player.getDuration()))));drawLyrics();update();}
+    try{await Spicetify.Player.seek(Math.round(Math.max(0,Math.min(start+lyricOffset,playbackDuration()))));drawLyrics();update();}
     catch{flashStatus('Couldn’t seek to this lyric.');}
   }
   let expandedRowsKey='',expandedButtons=[];
@@ -878,7 +896,7 @@
   function playerAPI(){return Spicetify.Platform?.PlayerAPI||Spicetify.Player.origin;}
   function queuedTracks() {
     try {
-      const state=Spicetify.Player.data||Spicetify.Player.origin?._state;
+      const state=playerState();
       const items=state?.nextItems?.length?state.nextItems:Spicetify.Queue?.nextTracks||[];
       return items.map(item=>item.contextTrack||item.track||item).filter(track=>track?.metadata?.title).slice(0,100);
     }catch{return [];}
@@ -1253,7 +1271,7 @@
   get('track').onchange=async()=>{
     const uri=seekingURI||currentURI(),position=Math.round(Number(get('track').value)),canceled=seekCanceled;seekingURI='';seekCanceled=false;
     if(canceled||!uri||uri!==currentURI()){update();return;}
-    try {await Spicetify.Player.seek(Math.max(0,Math.min(position,Spicetify.Player.getDuration())));}
+    try {await Spicetify.Player.seek(Math.max(0,Math.min(position,playbackDuration())));}
     catch {flashStatus('Couldn’t seek in this song.');}
     setTimeout(update,250);
   };
@@ -1263,7 +1281,7 @@
     const preview=get('up-next');preview.hidden=true;
     if(!(duration>0&&duration-progress<=20000&&duration-progress>0))return;
     try {
-      const state=Spicetify.Player.data||Spicetify.Player.origin?._state;
+      const state=playerState();
       const repeat=repeatMode()===2;
       const queued=repeat?currentTrack():(state?.nextItems?.[0]||Spicetify.Queue?.nextTracks?.[0]);
       const track=queued?.contextTrack||queued?.track||queued;
@@ -1274,7 +1292,7 @@
   }
   function playbackSource() {
     try {
-      const state=Spicetify.Player.data||Spicetify.Player.origin?._state,context=state?.context||{},meta=context.metadata||{};
+      const state=playerState(),context=state?.context||{},meta=context.metadata||{};
       const uri=context.uri||'',type=uri.split(':')[1]||'';
       const labels={playlist:'Playlist',album:'Album',artist:'Artist',station:'Radio',radio:'Radio',collection:'Liked Songs',search:'Search'};
       let name=meta.context_description||meta.context_name||meta.title||meta.name||'';
@@ -1379,11 +1397,11 @@
   }
   function update() {
     if(root.hidden||document.hidden) return;
-    syncLyricsVisibility();if(needsAnalysis())loadAnalysis();
+    refreshPlayerState();syncLyricsVisibility();if(needsAnalysis())loadAnalysis();
     else if(root.dataset.power==='low')text('caption','LOW POWER · VISUAL EFFECTS PAUSED · ESC TO RETURN');
     text('source',playbackSource());get('source').title=get('source').textContent;
     let meta = {};
-    try { meta = Spicetify.Player.data?.item?.metadata || Spicetify.Player.origin?._state?.item?.metadata || {}; } catch {}
+    try { meta = currentTrack()?.metadata || {}; } catch {}
     const title = meta.title || native('[data-testid="context-item-link"]')?.textContent || '';
     const artist = artistCredits(currentTrack()) || native('[data-testid="context-item-info-subtitles"]')?.textContent || '';
     text('title',title || 'Ready for music'); renderArtistLinks(artist); text('album',meta.album_title || '');get('album').disabled=!entityURI(albumURI(),'album');
@@ -1402,7 +1420,7 @@
       else { transitionArtwork(''); get('bg').style.backgroundImage = ''; }
     }
     let progress = 0, duration = 0;
-    try { progress = Spicetify.Player.getProgress(); duration = Spicetify.Player.getDuration(); } catch {}
+    try { progress = playbackProgress(); duration = playbackDuration(); } catch {}
     if(seekingURI&&seekingURI!==currentURI()){seekCanceled=true;seekingURI='';}
     get('track').max=String(Math.max(1,duration));get('track').disabled=!(duration>0)||!currentURI();
     if(!seekingURI)paintPosition(progress,duration);
@@ -1481,7 +1499,7 @@
 
     previous=now;
     drawLyrics();
-    let position=0;try{position=Spicetify.Player.getProgress();}catch{}
+    let position=0;try{position=playbackProgress();}catch{}
     const mode=motionMode(),features=needsAnalysis()&&(isPlaying||root.dataset.debug==='on')?analysisFeatures(analysis,position,mode):ambientFeatures;
     if(root.dataset.debug==='on')paintDebug(now,delta,position,features,mode);
     const pulseTarget=!lowPower&&!reduced.matches&&isPlaying&&root.dataset.beatUi!=='off'&&features.confidence>.55?features.pulse*(.25+.75*clamp01((features.channels[0]-.4)/1.2)):0;

@@ -1,3 +1,9 @@
+# 4.16.1 — Recover missing playback metadata
+
+- Fall back to Spotify PlayerAPI's synchronous current state when Spicetify's wrapper has no current item. Share that state for title/artwork, lyrics, position/duration, source and playback status.
+- Read fallback state only once per existing metadata update while the wrapper is unavailable; clear stale fallback data and return to the wrapper when it recovers. No new timer, network request or playback mutation.
+- Live symptom: Spotify played a DJ track while Resonance showed Ready for music. Restarting restored the wrapper; the exact cause of its missing state remains unconfirmed. The fallback is covered by a regression reproducing absent wrapper data and a valid direct player snapshot.
+
 # 4.16.0 — Shared Mac, Windows and Linux release
 
 - Promote all 4.16 preview changes to main and matching Mac, Windows and Linux packages.
