@@ -177,6 +177,7 @@
   .resonance-interlude-note {display:inline-block;font-family:"Apple Symbols","Segoe UI Symbol",-apple-system,sans-serif;font-size:24px;font-style:normal;line-height:1;color:var(--lyric-ink,var(--accent));animation:resonance-interlude 1.8s ease-in-out infinite;animation-play-state:paused}
   .resonance-interlude-note:nth-child(2) {animation-delay:.2s}.resonance-interlude-note:nth-child(3) {animation-delay:.4s}
   #resonance-root[data-playing="true"] .resonance-interlude-note {animation-play-state:running}
+  #resonance-root #resonance-expanded-lines button:not([aria-current="true"]) .resonance-interlude-note {animation:none;opacity:.5}
   @keyframes resonance-interlude {0%,100%{opacity:.3;transform:translateY(2px) scale(.75)}50%{opacity:1;transform:translateY(-3px) scale(1)}}
   @media(max-height:720px) {#resonance-artwork{width:40vh;max-width:100%}}
   @media(prefers-reduced-motion:reduce) {.resonance-palette-layer,#resonance-disc,.resonance-interlude-note{animation:none!important}.resonance-palette-layer,#resonance-tonearm,#resonance-expanded-lines button{transition:none!important}}
