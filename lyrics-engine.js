@@ -114,6 +114,32 @@ return module.exports;})();
       return timed(rows,duration);
     }catch{return [];}
   }
+  function qrc(input,duration){
+    if(typeof input!=='string'||input.length>500000||/<!DOCTYPE|<!ENTITY/i.test(input))return [];
+    // Read the attribute directly: XML DOM parsing normalizes attribute newlines.
+    const envelope=input.match(/\bLyricContent\s*=\s*(["'])([\s\S]*?)\1/);
+    if(!envelope)return [];
+    const entities={amp:'&',quot:'"',apos:"'",lt:'<',gt:'>'};
+    const body=envelope[2].replace(/&(#x[\da-f]+|#\d+|amp|quot|apos|lt|gt);/gi,(match,key)=>{
+      if(key[0]!=='#')return entities[key.toLowerCase()]||match;
+      const code=key[1].toLowerCase()==='x'?parseInt(key.slice(2),16):Number(key.slice(1));
+      return code>0&&code<=0x10ffff?String.fromCodePoint(code):'';
+    });
+    const rows=[];
+    for(const raw of body.split(/\r?\n/)){
+      const header=raw.trim().match(/^\[(\d+),(\d+)\]([\s\S]*)$/);if(!header)continue;
+      if(rows.length>=1500)return [];
+      const start=Number(header[1]),length=Number(header[2]),rest=header[3],words=[];let cursor=0;
+      for(const token of rest.matchAll(/\((\d+),(\d+)\)/g)){
+        if(words.length>=400)return [];
+        const begin=Number(token[1]);words.push({text:rest.slice(cursor,token.index),start:begin,end:begin+Number(token[2])});cursor=token.index+token[0].length;
+      }
+      const text=words.map(w=>w.text).join('')+rest.slice(cursor);
+      if(/^(?:lyrics by|composed by|arranged by|producer|作词|作曲|编曲|制作人)\s*[:：]/i.test(text.trim()))continue;
+      rows.push({text:text.trim(),start,end:length?start+length:undefined,words});
+    }
+    return timed(rows,duration);
+  }
   function wordProgress(word,time){return Math.max(0,Math.min(1,(time-word.start)/Math.max(1,word.end-word.start)));}
   function matchesTiming(candidate,baseline,duration){
     if(!candidate.some(row=>row.words?.length)||candidate.some(row=>row.end>duration+1000))return false;
@@ -130,5 +156,5 @@ return module.exports;})();
     const index=low-1;
     return {line:index<0||time>=rows[index].end?-1:index};
   }
-  globalThis.ResonanceLyrics={finalize,spotify,lrc,active,timed,lyricsfile,ttml,clock,wordProgress,matchesTiming};
+  globalThis.ResonanceLyrics={finalize,spotify,lrc,active,timed,lyricsfile,ttml,qrc,clock,wordProgress,matchesTiming};
 })();

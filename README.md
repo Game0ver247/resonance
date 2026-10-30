@@ -1,10 +1,10 @@
-> **Word-sync preview:** [4.17.0-preview.1](https://github.com/Game0ver247/resonance/releases/tag/v4.17.0-preview.1) adds genuine fine-timed lyrics and local diagnostic reports. [Testing guide](docs/testing/word-sync-preview.md). This branch is experimental; stable main/Homebrew remain 4.16.1.
+> **EXPERIMENTAL TEST BUILD — 4.17.0-experimental.1.** Word/syllable lyrics are being evaluated on this branch only. This is not a stable release. [Stable Resonance 4.16.1](https://github.com/Game0ver247/resonance/tree/main) and Homebrew do not include this experiment. [Test installation and known limitations](docs/testing/word-sync-preview.md).
 
 # Resonance
 
-An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current release: **4.16.1**, available for macOS, Windows and Linux (including Fedora). [Changelog](CHANGELOG.md).
+An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Stable release: **4.16.1**, available for macOS, Windows and Linux (including Fedora). [Changelog](CHANGELOG.md).
 
-[![Cross-platform checks](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml/badge.svg)](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml)
+[![Cross-platform checks](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml/badge.svg?branch=experimental%2Ftimed-lyrics)](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml)
 
 ## Features
 

@@ -1,8 +1,12 @@
-# 4.17.0-preview.1 — Genuine word/syllable lyrics and local diagnostics
+# 4.17.0-experimental.1 — Timed lyrics test build (not a stable release)
 
-Preview only: stable main/Homebrew remain on 4.16.1.
+Experimental branch only: stable main/Homebrew remain on 4.16.1. The previous public preview was withdrawn; this build still needs listening tests.
 
-- Add validated Better Lyrics TTML syllable/word timing, then LRCLIB Lyricsfile word timing; retain Spotify/LRCLIB line lyrics when unavailable. Do not estimate token timing.
+- Treat a missing-key 401 as query-specific so it does not suppress all later tracks. Share 429 cooldown across Better Lyrics endpoints; retain endpoint cooldowns for 403/503.
+- Add bounded QRC parsing and fallback tests. Group Retry lyrics with standard settings controls.
+- Live QQ checks returned usable matching timing for E85 and Wanderlust. Ay No Puedo returned API-key-required even though the public docs describe keyless QQ access. No API key is included.
+
+- Add validated Better Lyrics TTML syllable/word timing, QQ QRC word timing as a fallback, then LRCLIB Lyricsfile word timing; retain Spotify/LRCLIB line lyrics when unavailable. Do not estimate token timing.
 - Add Lyrics → Word highlighting Auto/Off, Retry lyrics, active-line token sweep, pause/seek/offset support and visible Word sync/Line sync labels. Keep provider translations and ordinary keyword emphasis on line-only rows.
 - Request recording title/artist/album/duration, conservatively compare fine timing with the line baseline, cancel stale requests, cache results and honor provider cooldowns. Better Lyrics uses Spicetify's configured public HTTPS proxy without Spotify authorization.
 - Bundle js-yaml 4.1.1 with its MIT license inside the lyric engine to safely read bounded Lyricsfile input; no runtime dependency installation.

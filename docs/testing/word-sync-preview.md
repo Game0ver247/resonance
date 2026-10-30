@@ -1,12 +1,42 @@
-# Word-sync preview testing
+# Experimental timed-lyrics test build
 
 This preview adds genuine word/syllable timing and a local diagnostic report. Stable main/Homebrew stay unchanged until the preview is accepted.
+
+## Opt-in installation
+
+Stable users should keep the [4.16.1 release](https://github.com/Game0ver247/resonance/releases/tag/v4.16.1) or Homebrew install. This branch has no release assets and is not distributed through Homebrew.
+
+To test from source, clone into a separate directory:
+
+```sh
+git clone --branch experimental/timed-lyrics --single-branch https://github.com/Game0ver247/resonance.git resonance-timed-lyrics-test
+cd resonance-timed-lyrics-test
+```
+
+With Python 3 and Spicetify already installed, run `python3 maintenance.py update` on macOS/Linux, or `py maintenance.py update` on Windows. This replaces your installed Resonance extension and restarts Spotify. See the README for platform prerequisites; its normal terminal installers select stable, not this experiment.
+
+To return to stable from this clone:
+
+```sh
+git fetch origin main:refs/remotes/origin/main
+git switch --detach origin/main
+```
+
+Then run the same maintenance update command. This restores stable code; saved appearance preferences remain.
+
+## Current limitations
+
+- Provider order is TTML → QQ → LRCLIB word timing → line lyrics. Only fine data matching the recording's line baseline is accepted for TTML/QQ.
+- No API key is bundled. A 401 means the query may require authorization, not that timing does not exist. A 401 does not disable later songs. A 429 pauses the shared service according to its cooldown.
+- Better Lyrics currently says new API keys are not being issued. Live QQ returned API-key-required for one sample despite its documentation claiming keyless cache misses. Coverage and access remain inconsistent.
+- QQ returned 39 lines (38 word-timed, 287 segments) for E85 and 88 word-timed lines (399 segments) for Wanderlust, both matching LRCLIB baselines. These are retrieval/parser checks, not proof of listening accuracy across the catalog.
+- No microphone or audio capture. No invented word timing. Listening, pause/seek accuracy, long-session performance and interactive Windows/Linux checks still need testing.
 
 ## What to try
 
 1. Open Resonance → Lyrics → Word highlighting → Auto (default).
 2. Play a song. Spotify line lyrics appear first; validated word timing can upgrade them after the provider responds.
-3. Check the label beneath the lyrics: **Better Lyrics · Word sync**, **LRCLIB · Word sync**, or the existing provider with **Line sync**.
+3. Check the label beneath the lyrics: **Better Lyrics · Word sync**, **Better Lyrics QQ · Word sync**, **LRCLIB · Word sync**, or the existing provider with **Line sync**.
 4. Try both single-line and Lyrics + artwork views, pause/resume, seek forward/back, change songs quickly, and use the existing lyric-offset controls if needed.
 5. Turn Word highlighting Off to compare against ordinary line lyrics/keyword emphasis. **Retry lyrics** retries the current track while respecting provider cooldowns.
 
