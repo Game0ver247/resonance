@@ -1,6 +1,6 @@
 # Resonance
 
-An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current release: **4.16.1**, available for macOS, Windows and Linux (including Fedora). [Changelog](CHANGELOG.md).
+An album-focused listening interface inside Spotify desktop, built with Spicetify. Includes macOS, Windows and Linux (including Fedora) installation tools. Current release: **4.16.2**, available for macOS, Windows and Linux (including Fedora). [Changelog](CHANGELOG.md).
 
 [![Cross-platform checks](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml/badge.svg)](https://github.com/Game0ver247/resonance/actions/workflows/tests.yml)
 
@@ -10,7 +10,7 @@ An album-focused listening interface inside Spotify desktop, built with Spicetif
 - Play/pause, previous/next, seek bar, save/unsave, shuffle and repeat.
 - Queue drawer with thumbnails, durations, next-track preview, refresh/clear controls and supported jump/reorder/remove actions.
 - Art-left, centered-art, lyrics-only and Lyrics + artwork layouts, with song details along the bottom in the combined view.
-- Synced single-line and scrolling lyrics, click-to-seek, optional translations and per-song timing adjustments.
+- Synced single-line and scrolling lyrics, click-to-seek, optional translations and per-song timing adjustments. Provider info is optional under Lyrics → Lyrics source info (Off by default); layout selection stays in settings.
 - Album-colored keyword emphasis, automatic lyric contrast and animated musical-note interludes.
 - Cover or BPM-driven vinyl artwork, progress-following tonearm, coasting pause animation and optional beat pulse.
 - Opaque Dark, Artwork, animated album-color Mesh and static Accent backgrounds; Mesh uses up to eight distinct cover-color splashes with optional slow time- or beat-based color rotation.

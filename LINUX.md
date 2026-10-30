@@ -2,7 +2,9 @@
 
 Resonance runs inside the Spotify desktop app through Spicetify. This is the same listening interface as the Mac and Windows versions, packaged with Linux maintenance commands. It is not a separate audio player or an RPM.
 
-Release 4.16 includes search tabs with Spotify result ordering, album-context playback and album drawer, playlist queue, clickable Up Next, missing-lyrics artwork fallback, gradual Mesh rotation, progress-following vinyl tonearm, and reduced idle wakeups/request caching. Mesh effects respect Low power and reduced motion.
+Release 4.16.2 includes search tabs with Spotify result ordering, album-context playback and album drawer, playlist queue, clickable Up Next, missing-lyrics artwork fallback, gradual Mesh rotation, progress-following vinyl tonearm, and reduced idle wakeups/request caching. Mesh effects respect Low power and reduced motion.
+
+The shared 4.16.2 UI removes the shortcut beneath lyrics. Choose Lyrics + artwork in layout settings instead. Lyrics → Lyrics source info defaults Off; On shows just Spotify/LRCLIB, including when single-line lyrics are hidden. Timed word/syllable lyrics remain experimental and are not part of this release.
 
 Use the `main` branch for source updates. The same archive supports configured native Spotify and Flatpak installations. No separate Flatpak build is needed.
 

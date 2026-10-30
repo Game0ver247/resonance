@@ -104,7 +104,7 @@ for(const layout of ['left','center']){
  api.setSingleLine('on',false);assert.equal(root.dataset.artNoLyrics,'false');assert.equal(get('lyric-line').inert,false);
 }
 api.setLayout('center',false);assert.equal(root.dataset.layout,'center');assert.equal(get('expanded-lyrics').hidden,true);
-api.toggleExpanded();assert.equal(root.dataset.layout,'karaoke');assert.equal(get('expanded-lyrics').hidden,false);assert.equal(get('expand-lyrics').textContent,'Exit lyrics view');
+api.toggleExpanded();assert.equal(root.dataset.layout,'karaoke');assert.equal(get('expanded-lyrics').hidden,false);
 api.toggleExpanded();assert.equal(root.dataset.layout,'center');
 api.setLyricStyle('off',false);api.syncLyricsVisibility();api.setLayout('lyrics',false);assert.equal(root.dataset.lyricStyle,'animated');assert.equal(get('lyrics').style.visibility,'visible');assert.equal(get('expanded-lyrics').hidden,false);
 api.setLyricStyle('off',false);api.syncLyricsVisibility();assert.equal(get('expanded-lyrics').hidden,true);

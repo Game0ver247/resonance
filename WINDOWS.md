@@ -1,6 +1,8 @@
 # Resonance for Windows
 
-Release 4.16 includes the latest shared search, playback, lyrics, Mesh, vinyl tonearm and efficiency updates.
+Release 4.16.2 includes the latest shared search, playback, lyrics, Mesh, vinyl tonearm and efficiency updates.
+
+The shared 4.16.2 UI removes the shortcut beneath lyrics. Choose Lyrics + artwork in layout settings instead. Lyrics → Lyrics source info defaults Off; On shows just Spotify/LRCLIB, including when single-line lyrics are hidden. Timed word/syllable lyrics remain experimental and are not part of this release.
 
 Start with the Windows section of [README.md](README.md). After installing Spotify, Spicetify and Python 3.9+, extract this entire folder and double-click **Install Resonance.cmd**.
 

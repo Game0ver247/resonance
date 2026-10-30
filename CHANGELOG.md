@@ -1,3 +1,11 @@
+# 4.16.2 — Cleaner lyrics controls on Mac, Windows and Linux
+
+- Remove the inline Lyrics + artwork / Exit lyrics view shortcut. Select either view from Look & layout settings.
+- Add Lyrics → Lyrics source info, Off by default. When enabled, show only the provider name; omit instrumental/sync status labels.
+- Fix a CSS rule that hid enabled source info and missing-lyrics notices when single-line lyrics were hidden in artwork layouts.
+- Keep line-synced lyrics in stable. Word/syllable timing and its extra providers remain only on experimental/timed-lyrics.
+- Shared UI and maintenance packages support Mac, Windows, Ubuntu and Fedora/native or configured Flatpak Spotify. Platform CI validates code and launchers; interactive Windows/Linux Spotify sessions remain unverified.
+
 # 4.16.1 — Recover missing playback metadata
 
 - Fall back to Spotify PlayerAPI's synchronous current state when Spicetify's wrapper has no current item. Share that state for title/artwork, lyrics, position/duration, source and playback status.
